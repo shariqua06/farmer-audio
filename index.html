@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Farmer Subsidy Application — Ready</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* Polished UI (same style as earlier) */
+  body { font-family: 'Inter', Arial, sans-serif; background: linear-gradient(135deg,#f7ffe0 0%,#e0e7ff 100%); color:#1e2539; min-height:100vh; margin:0; display:flex; align-items:center; justify-content:center; }
+  .container { background:#fff; border-radius:18px; width:100%; max-width:620px; padding:28px 20px; box-shadow:0 10px 40px rgba(30,40,80,0.08); }
+  h2 { text-align:center; color:#4f46e5; margin:0 0 6px; }
+  .subtitle { text-align:center; color:#7b8198; margin-bottom:14px; }
+  #progressBar { width:100%; height:8px; background:#f1f5f9; border-radius:8px; overflow:hidden; margin-bottom:16px; }
+  #progressBar span { display:block; height:100%; width:0; background:linear-gradient(90deg,#7a88ff,#48bee5); transition:width .35s ease; }
+  .field-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:10px; }
+  .field-row > div { flex:1; }
+  .field-label { display:flex; gap:8px; align-items:center; font-weight:600; margin-bottom:6px; color:#283046; }
+  input, select { width:100%; padding:12px 14px; border-radius:10px; border:2px solid #e6e9f5; background:#fbfeff; font-size:15px; }
+  input:focus, select:focus { outline:none; border-color:#7a88ff; box-shadow:0 6px 18px rgba(120,130,255,0.08); }
+  .icon { font-family:'Material Icons'; color:#48bee5; font-size:20px; }
+  .voice-btn { width:40px; height:40px; border-radius:50%; border:0; background:#ebe6ff; color:#513ae8; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+  .voice-btn[aria-busy='true'] { background:#ffeaa7; color:#d35400; }
+  .hint { color:#6f7aa6; font-size:13px; display:flex; gap:8px; align-items:center; margin-top:6px; margin-bottom:8px; }
+  #video { width:100%; min-height:130px; border-radius:12px; background:#efefef; border:2px solid #e6ebff; object-fit:cover; display:block; }
+  .num-keypad { display:flex; gap:6px; flex-wrap:wrap; }
+  .num-keypad button { flex:1 0 30%; padding:10px; border-radius:8px; border:1px solid #d6d6f0; background:#f7f7ff; font-size:16px; cursor:pointer; }
+  .submit-btn { width:100%; padding:12px; background:#4f46e5; color:#fff; border:0; border-radius:10px; font-weight:700; margin-top:14px; cursor:pointer; }
+  .small-muted { font-size:12px; color:#96a1be; margin-top:6px; }
+  @media (max-width:520px){ .container{padding:16px;} #video{min-height:90px;} }
+</style>
+</head>
+<body>
+  <div class="container" aria-label="Farmer Subsidy Application">
+    <h2>Farmer Subsidy Application</h2>
+    <div class="subtitle">Tamil prompts → English voice input · Camera OCR · Numeric keypad</div>
+
+    <div id="progressBar" aria-hidden="true"><span></span></div>
+
+    <form id="form" autocomplete="off">
+      <!-- Name -->
+      <div class="field-row">
+        <div>
+          <label class="field-label"><span class="icon">person</span>Name</label>
+          <input id="name" placeholder="Enter name" required />
+        </div>
+        <button type="button" id="voiceName" class="voice-btn" aria-label="Voice name"><span class="icon">mic</span></button>
+      </div>
+
+      <!-- Location -->
+      <div class="field-row">
+        <div>
+          <label class="field-label"><span class="icon">location_on</span>Farm Location</label>
+          <input id="location" placeholder="Enter farm location" required />
+        </div>
+        <button type="button" id="voiceLocation" class="voice-btn" aria-label="Voice location"><span class="icon">mic</span></button>
+      </div>
+
+      <!-- Subsidy -->
+      <div class="field-row">
+        <div>
+          <label class="field-label"><span class="icon">local_florist</span>Subsidy Type</label>
+          <select id="subsidyType" required>
+            <option value="">-- Select --</option>
+            <option value="urimam">Urimam (Fertilizer)</option>
+            <option value="parivu">Parivu (Irrigation)</option>
+            <option value="vidhai">Vidhai (Seed)</option>
+            <option value="ubagaranam">Ubagaranam (Equipment)</option>
+          </select>
+        </div>
+        <button type="button" id="voiceSubsidy" class="voice-btn" aria-label="Voice subsidy"><span class="icon">mic</span></button>
+      </div>
+
+      <!-- Amount -->
+      <div class="field-row">
+        <div>
+          <label class="field-label"><span class="icon">payments</span>Amount</label>
+          <input id="amount" placeholder="Enter amount" inputmode="numeric" required />
+          <div class="num-keypad" id="numKeypad" aria-hidden="false" style="margin-top:8px;"></div>
+        </div>
+        <button type="button" id="voiceAmount" class="voice-btn" aria-label="Voice amount"><span class="icon">mic</span></button>
+      </div>
+
+      <!-- Aadhaar OCR -->
+      <div style="margin-top:8px;">
+        <label class="field-label"><span class="icon">credit_card</span>Aadhaar Card</label>
+        <video id="video" autoplay playsinline muted></video>
+        <div class="hint"><span class="icon">fact_check</span>Hold card steady; Aadhaar number will auto-fill below</div>
+        <input id="aadhaarNumber" placeholder="Aadhaar number (auto-fill)" readonly required />
+        <div id="cameraError" class="small-muted" style="color:#b91c1c; display:none;">Camera not available or permission denied</div>
+        <div id="bankLink" class="small-muted" style="color:#15803d; display:none;">Bank (dummy) linked ✅</div>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit</button>
+    </form>
+  </div>
+
+  <!-- Tesseract v5.3.1 and script -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.3.1/dist/tesseract.min.js"></script>
+  <script>
+  (function(){
+
+    // ---------- helper: progress ----------
+    const progressBar = document.querySelector("#progressBar span");
+    function setProgress(n){ progressBar.style.width = n + "%"; }
+    setProgress(12);
+    ["name","location","subsidyType","amount","aadhaarNumber"].forEach((id,i)=>{
+      const el=document.getElementById(id);
+      el && el.addEventListener("focus", ()=> setProgress((i+1)*18));
+    });
+
+    // ---------- numeric keypad ----------
+    const numKeypad = document.getElementById("numKeypad");
+    const amountInput = document.getElementById("amount");
+    ["1","2","3","4","5","6","7","8","9","0"].forEach(k=>{
+      const b=document.createElement("button");
+      b.type="button";
+      b.textContent=k;
+      b.onclick = ()=> amountInput.value += k;
+      numKeypad.appendChild(b);
+    });
+
+    // ---------- audio links (jsDelivr) ----------
+    const voiceLinks = {
+      name: "https://cdn.jsdelivr.net/gh/shariqua06/farmer-audio@main/name.mp3",
+      location: "https://cdn.jsdelivr.net/gh/shariqua06/farmer-audio@main/farm-location.mp3",
+      subsidy: "https://cdn.jsdelivr.net/gh/shariqua06/farmer-audio@main/type.mp3",
+      amount: "https://cdn.jsdelivr.net/gh/shariqua06/farmer-audio@main/amount.mp3"
+    };
+
+    // pre-create Audio objects (lazy)
+    const audioCache = {};
+    function getAudio(key){
+      if(!audioCache[key]) audioCache[key] = new Audio(voiceLinks[key]);
+      return audioCache[key];
+    }
+
+    // ---------- speech binding (Tamil audio first) ----------
+    function bindVoice(buttonId, inputId, audioKey){
+      const btn = document.getElementById(buttonId);
+      const input = document.getElementById(inputId);
+
+      btn.addEventListener("click", async function(){
+        btn.setAttribute("aria-busy","true");
+        try {
+          // play Tamil prompt (audio served via jsDelivr)
+          const audio = getAudio(audioKey);
+          // browsers require user gesture to start audio — this handler is a user gesture
+          await audio.play().catch(()=>{ /* ignore play rejection */ });
+
+          // after audio ends (or immediately if ended), start recognition
+          const startRecognition = ()=> {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition){
+              alert("Speech recognition not supported in this browser.");
+              btn.removeAttribute("aria-busy");
+              return;
+            }
+            const rec = new SpeechRecognition();
+            rec.lang = "en-IN";
+            rec.interimResults = false;
+            rec.maxAlternatives = 1;
+            rec.onresult = (e)=> {
+              const txt = e.results[0][0].transcript || "";
+              if(input.tagName.toLowerCase() === "select"){
+                // for subsidy select, try to match option by text
+                const options = Array.from(input.options);
+                const found = options.find(o => o.text.toLowerCase().includes(txt.toLowerCase()));
+                if(found) input.value = found.value;
+                else input.value = txt;
+              } else {
+                input.value = txt;
+              }
+              rec.stop();
+              btn.removeAttribute("aria-busy");
+            };
+            rec.onerror = ()=> { rec.stop(); btn.removeAttribute("aria-busy"); };
+            try { rec.start(); } catch(e){ btn.removeAttribute("aria-busy"); }
+          };
+
+          if(!audio.paused && !audio.ended){
+            // wait for audio to end
+            audio.onended = startRecognition;
+          } else {
+            // audio already ended or couldn't play — start recognition right away
+            startRecognition();
+          }
+        } catch(err){
+          console.warn("voice handler error", err);
+          btn.removeAttribute("aria-busy");
+        }
+      });
+    }
+
+    bindVoice("voiceName","name","name");
+    bindVoice("voiceLocation","location","location");
+    bindVoice("voiceSubsidy","subsidyType","subsidy");
+    bindVoice("voiceAmount","amount","amount");
+
+    // ---------- Camera + Tesseract OCR (Aadhaar) ----------
+    const video = document.getElementById("video");
+    const aadhaarInput = document.getElementById("aadhaarNumber");
+    const cameraError = document.getElementById("cameraError");
+    const bankLink = document.getElementById("bankLink");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    let ocrWorker = null;
+    let ocrReady = false;
+    let cameraAvailable = false;
+
+    async function initOCR(){
+      try {
+        // use createWorker from Tesseract
+        const { createWorker } = Tesseract;
+        ocrWorker = createWorker({ logger: m => { /console.log(m)/ } });
+        await ocrWorker.load();
+        await ocrWorker.loadLanguage("eng");
+        await ocrWorker.initialize("eng");
+        ocrReady = true;
+      } catch(e){
+        console.warn("Tesseract init failed", e);
+        ocrReady = false;
+      }
+    }
+    initOCR();
+
+    async function startCamera(){
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        video.srcObject = stream;
+        video.play();
+        cameraAvailable = true;
+        cameraError.style.display = "none";
+      } catch(e){
+        cameraAvailable = false;
+        cameraError.style.display = "block";
+        console.warn("camera start failed", e);
+      }
+    }
+    startCamera();
+
+    async function scanLoop(){
+      if(ocrReady && cameraAvailable && video.readyState >= 2){
+        try {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/png");
+          const { data } = await ocrWorker.recognize(dataUrl);
+          if(data && data.text){
+            const match = data.text.match(/\b\d{4}\s*\d{4}\s*\d{4}\b/);
+            if(match){
+              const aad = match[0].replace(/\s/g,"");
+              if(aad && aad.length === 12 && aadhaarInput.value !== aad){
+                aadhaarInput.value = aad;
+                bankLink.style.display = "block";
+                // optionally stop camera after successful read
+                // let tracks = video.srcObject?.getTracks() || [];
+                // tracks.forEach(t => t.stop());
+              }
+            }
+          }
+        } catch(e){ /* ignore OCR errors to keep loop alive */ }
+      }
+      requestAnimationFrame(scanLoop);
+    }
+    requestAnimationFrame(scanLoop);
+
+    // ---------- Form submit and validation ----------
+    document.getElementById("form").addEventListener("submit", (e)=>{
+      e.preventDefault();
+      const required = ["name","location","subsidyType","amount","aadhaarNumber"];
+      let ok = true;
+      required.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el.value || el.value.trim()===""){ el.style.borderColor = "#ee2929"; ok=false; setTimeout(()=>el.style.borderColor="",1600); }
+      });
+      if(!ok){ alert("Please fill all required fields."); return; }
+      // show summary
+      alert(
+        "Form submitted!\n" +
+        "Name: " + document.getElementById("name").value + "\n" +
+        "Location: " + document.getElementById("location").value + "\n" +
+        "Subsidy: " + document.getElementById("subsidyType").value + "\n" +
+        "Amount: " + document.getElementById("amount").value + "\n" +
+        "Aadhaar: " + document.getElementById("aadhaarNumber").value
+      );
+      // reset
+      document.getElementById("form").reset();
+      setProgress(12);
+      aadhaarInput.value = "";
+      bankLink.style.display = "none";
+    });
+
+    // quick user guidance if audio fails to play automatically:
+    // note: browsers allow audio.play() in direct user click handlers; if browser blocks autoplay, clicking button is sufficient.
+    window.addEventListener('unhandledrejection', e => {
+      console.warn('Unhandled promise', e);
+    });
+  })();
+  </script>
+</body>
+</html>
