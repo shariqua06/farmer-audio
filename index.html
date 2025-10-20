@@ -6,7 +6,7 @@
 <title>Farmer Subsidy Application – AI Form Filler</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Icons&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ========== BASIC STYLING ========== */
+/* ===== BASIC STYLING ===== */
 body {
   font-family: 'Inter', Arial, sans-serif;
   background: linear-gradient(135deg, #f7ffe0 0%, #e0e7ff 100%);
@@ -46,6 +46,7 @@ input:focus, select:focus { border-color:#7a88ff; outline:none; background:#f6fa
 .numeric-keypad { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px;}
 .numeric-keypad button { flex:1 0 22%; padding:12px; font-size:1.1em; border-radius:6px; border:1px solid #ccc; background:#f0f0ff; cursor:pointer;}
 .numeric-keypad button:active { background:#d0d0ff;}
+#successTick {display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:80px; color:#16a34a; z-index:9999;}
 @media(max-width:520px){.container{max-width:97vw;padding:10px;border-radius:12px;}#video{min-height:80px;}.voice-btn{width:45px;height:45px;font-size:24px;}}
 </style>
 </head>
@@ -110,17 +111,18 @@ input:focus, select:focus { border-color:#7a88ff; outline:none; background:#f6fa
 
 <button type="submit" class="submit-btn">Submit Form</button>
 </form>
+<div id="successTick">✔</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.4.0/dist/tesseract.min.js"></script>
 <script>
-/* ========== PROGRESS BAR ========== */
+/* ===== PROGRESS BAR ===== */
 function setProgress(val){document.querySelector("#progressBar span").style.width=val+"%";}
 ["name","location","subsidyType","amount","aadhaarNumber"].forEach((id,i)=>{
   document.getElementById(id).addEventListener("focus",()=>setProgress((i+1)*20));
 });
 
-/* ========== CAMERA + OCR ========== */
+/* ===== CAMERA + OCR ===== */
 const video=document.getElementById("video");
 const aadhaarInput=document.getElementById("aadhaarNumber");
 const bankLink=document.getElementById("bankLink");
@@ -128,7 +130,7 @@ const canvas=document.createElement("canvas");
 const ctx=canvas.getContext("2d");
 let ocrWorker;
 async function initOCR(){
-  ocrWorker=Tesseract.createWorker();
+  ocrWorker=Tesseract.createWorker({logger:m=>console.log(m)});
   await ocrWorker.load();
   await ocrWorker.loadLanguage('eng');
   await ocrWorker.initialize('eng');
@@ -139,9 +141,7 @@ async function startCamera(){
     const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
     video.srcObject=stream;
     video.play();
-  }catch(e){
-    console.warn("Camera error",e);
-  }
+  }catch(e){ console.warn("Camera error",e); }
 }
 startCamera();
 async function scanFrame(){
@@ -157,7 +157,7 @@ async function scanFrame(){
 }
 scanFrame();
 
-/* ========== NUMERIC KEYPAD ========== */
+/* ===== NUMERIC KEYPAD ===== */
 const keypadContainer=document.getElementById("numericKeypad");
 const amountInput=document.getElementById("amount");
 [1,2,3,4,5,6,7,8,9,0].forEach(n=>{
@@ -167,16 +167,32 @@ const amountInput=document.getElementById("amount");
   keypadContainer.appendChild(btn);
 });
 
-/* ========== VOICE INPUT ========== */
+/* ===== VOICE INPUT ===== */
 const tamilAudios={
   name:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/name.mp3',
   location:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/farmlocation.mp3',
   subsidyType:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/type.mp3',
   amount:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/amount.mp3'
 };
+
+function disableOtherMics(activeBtn){
+  document.querySelectorAll('.voice-btn').forEach(btn=>{ if(btn!==activeBtn) btn.disabled=true; });
+}
+function enableAllMics(){ document.querySelectorAll('.voice-btn').forEach(btn=>btn.disabled=false); }
+
+function showSuccessTick(){
+  const allFilled=['name','location','subsidyType','amount','aadhaarNumber'].every(id=>document.getElementById(id).value);
+  if(allFilled){
+    const tick=document.getElementById('successTick');
+    tick.style.display='block';
+    setTimeout(()=>{tick.style.display='none';},2500);
+  }
+}
+
 function playThenListen(tamilUrl,inputId,mapValues={}){
   const btn=document.getElementById("voice"+inputId.charAt(0).toUpperCase()+inputId.slice(1));
   btn.disabled=true; btn.classList.add("recording");
+  disableOtherMics(btn);
   const audio=new Audio(tamilUrl);
   audio.play();
   audio.onended=()=>{
@@ -186,14 +202,20 @@ function playThenListen(tamilUrl,inputId,mapValues={}){
     recognition.maxAlternatives=1;
     recognition.onresult=e=>{
       let text=e.results[0][0].transcript.trim().toLowerCase();
-      if(mapValues[text]){ text=mapValues[text]; }
+      if(mapValues[text]) text=mapValues[text];
       document.getElementById(inputId).value=text;
       btn.disabled=false; btn.classList.remove("recording");
+      enableAllMics();
+      showSuccessTick();
     };
-    recognition.onerror=()=>{ btn.disabled=false; btn.classList.remove("recording"); };
+    recognition.onerror=()=>{
+      btn.disabled=false; btn.classList.remove("recording");
+      enableAllMics();
+    };
     recognition.start();
   };
 }
+
 document.getElementById("voiceName").onclick=()=>playThenListen(tamilAudios.name,'name');
 document.getElementById("voiceLocation").onclick=()=>playThenListen(tamilAudios.location,'location');
 document.getElementById("voiceSubsidy").onclick=()=>playThenListen(tamilAudios.subsidyType,'subsidyType',{
@@ -201,7 +223,7 @@ document.getElementById("voiceSubsidy").onclick=()=>playThenListen(tamilAudios.s
 });
 document.getElementById("voiceAmount").onclick=()=>playThenListen(tamilAudios.amount,'amount');
 
-/* ========== FORM SUBMIT ========== */
+/* ===== FORM SUBMIT ===== */
 document.getElementById("form").onsubmit=function(e){
   e.preventDefault();
   let valid=true;
