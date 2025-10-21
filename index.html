@@ -6,9 +6,9 @@
 <title>Farmer Subsidy Application – AI Form Filler</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Icons&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body {
+body{
   font-family:'Inter',Arial,sans-serif;
-  background: linear-gradient(135deg,#f7e0ff 0%,#e0d4ff 100%);
+  background:linear-gradient(135deg,#f7e0ff 0%,#e0f7ff 100%);
   color:#1e2539;
   min-height:100vh;
   margin:0;
@@ -16,27 +16,27 @@ body {
   align-items:center;
   justify-content:center;
 }
-.container {
+.container{
   background:#fff;
   border-radius:20px;
   width:100%;
   max-width:520px;
-  padding:28px 14px 38px 14px;
+  padding:28px 20px 38px 20px;
   box-shadow:0 8px 32px rgba(112,144,176,0.18);
 }
-h2 {
+h2{
   text-align:center;
-  color:#7a3fff;
+  color:#7a00ff;
   margin-bottom:.35em;
   letter-spacing:1.2px;
 }
-.subtitle {
+.subtitle{
   text-align:center;
   color:#888da8;
   font-size:1rem;
   margin:0 0 16px 0;
 }
-#progressBar {
+#progressBar{
   width:100%;
   height:7px;
   background:#f1f5f9;
@@ -44,14 +44,14 @@ h2 {
   margin:12px 0 20px;
   overflow:hidden;
 }
-#progressBar span {
+#progressBar span{
   display:block;
   height:100%;
-  background:linear-gradient(90deg,#b97aff,#ff77d9);
+  background:linear-gradient(90deg,#b676ff,#f48fb1);
   width:0%;
   transition:width .4s;
 }
-.field-label {
+.field-label{
   font-weight:600;
   font-size:1.03em;
   margin-bottom:4px;
@@ -59,7 +59,7 @@ h2 {
   align-items:center;
   gap:7px;
 }
-input,select {
+input,select{
   width:100%;
   border:2px solid #e3e7f4;
   background:#fafdff;
@@ -69,27 +69,27 @@ input,select {
   margin-bottom:10px;
   transition:border .2s;
 }
-input:focus,select:focus {
-  border-color:#7a3fff;
+input:focus,select:focus{
+  border-color:#7a88ff;
   outline:none;
   background:#f6fafd;
   box-shadow:0 2px 8px rgba(120,130,255,0.12);
 }
-.field-row {
+.field-row{
   display:flex;
   gap:7px;
   margin-bottom:8px;
   align-items:flex-start;
 }
-.icon {
+.icon{
   font-family:'Material Icons';
   font-weight:normal;
   font-style:normal;
   font-size:1.35em;
-  color:#ff77d9;
+  color:#48bee5;
   vertical-align:bottom;
 }
-.voice-btn {
+.voice-btn{
   background:#ebe6ff;
   color:#523ae8;
   border-radius:50%;
@@ -103,17 +103,16 @@ input:focus,select:focus {
   cursor:pointer;
   font-size:28px;
   margin-left:7px;
-  position:relative;
   transition:background .2s;
 }
-.voice-btn.recording {
-  box-shadow: 0 0 12px #ff77d9;
+.voice-btn.active{
+  box-shadow:0 0 12px #7a00ff;
 }
-.voice-btn:disabled {
+.voice-btn:disabled{
   opacity:.5;
   cursor:not-allowed;
 }
-#video {
+#video{
   width:100%;
   border-radius:14px;
   margin-top:10px;
@@ -123,15 +122,15 @@ input:focus,select:focus {
   object-fit:cover;
   border:2px solid #e0e7ff;
 }
-#aadhaarNumber[readonly] {
+#aadhaarNumber[readonly]{
   font-weight:600;
   background:#f4f8ff;
 }
-.submit-btn {
+.submit-btn{
   width:100%;
   padding:13px;
   color:#fff;
-  background:#7a3fff;
+  background:#7a00ff;
   border-radius:12px;
   border:none;
   font-size:1.1em;
@@ -139,16 +138,16 @@ input:focus,select:focus {
   margin-top:18px;
   cursor:pointer;
 }
-.submit-btn:hover {
-  background:#ff77d9;
+.submit-btn:hover{
+  background:#f48fb1;
 }
-.numeric-keypad {
+.numeric-keypad{
   display:flex;
   flex-wrap:wrap;
   gap:4px;
   margin-bottom:10px;
 }
-.numeric-keypad button {
+.numeric-keypad button{
   flex:1 0 22%;
   padding:12px;
   font-size:1.1em;
@@ -157,10 +156,10 @@ input:focus,select:focus {
   background:#f0f0ff;
   cursor:pointer;
 }
-.numeric-keypad button:active {
+.numeric-keypad button:active{
   background:#d0d0ff;
 }
-#successTick {
+#successTick{
   display:none;
   position:fixed;
   top:50%;
@@ -170,112 +169,142 @@ input:focus,select:focus {
   color:#16a34a;
   z-index:9999;
 }
+.subsidy-btn{
+  border:none;
+  border-radius:12px;
+  padding:8px 12px;
+  margin:4px;
+  font-size:1em;
+  cursor:pointer;
+  background:#f3e5f5;
+  color:#6a1b9a;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:all .3s;
+}
+.subsidy-btn:hover{
+  background:#ce93d8;
+  color:#fff;
+}
 @media(max-width:520px){
-  .container {max-width:97vw;padding:10px;border-radius:12px;}
-  #video {min-height:80px;}
-  .voice-btn {width:45px;height:45px;font-size:24px;}
+  .container{max-width:97vw;padding:10px;border-radius:12px;}
+  #video{min-height:80px;}
+  .voice-btn{width:45px;height:45px;font-size:24px;}
 }
 </style>
-<!-- PART 2: JS + HTML continuation -->
+</head>
+<body>
 <div class="container">
+<h2>Farmer Subsidy Application</h2>
+<div class="subtitle">Voice + Camera + Numeric Input. Tamil & English prompts included.</div>
+<div id="progressBar"><span></span></div>
 <form id="form" autocomplete="off">
-
-<!-- Name -->
-<div class="field-row">
-  <div style="flex:1;">
-    <label class="field-label" for="name"><span class="icon">person</span>Name</label>
-    <input id="name" placeholder="Enter Name">
-  </div>
-  <button type="button" class="voice-btn" id="voiceName"><span class="icon">mic</span></button>
-</div>
-
-<!-- Farm Location -->
-<div class="field-row">
-  <div style="flex:1;">
-    <label class="field-label" for="location"><span class="icon">location_on</span>Farm Location</label>
-    <input id="location" placeholder="Enter Location">
-  </div>
-  <button type="button" class="voice-btn" id="voiceLocation"><span class="icon">mic</span></button>
-</div>
-
-<!-- Subsidy Type -->
-<div class="field-row">
-  <div style="flex:1;">
-    <label class="field-label" for="subsidyType"><span class="icon">agriculture</span>Subsidy Type</label>
-    <div id="subsidyOptions">
-      <button type="button" class="subsidy-btn" data-value="urimam">
-        <span class="icon">local_florist</span> உரிமம் / Urimam
-      </button>
-      <button type="button" class="subsidy-btn" data-value="parivu">
-        <span class="icon">eco</span> பரிவு / Parivu
-      </button>
-      <button type="button" class="subsidy-btn" data-value="vidhai">
-        <span class="icon">grass</span> விதை / Vidhai
-      </button>
-      <button type="button" class="subsidy-btn" data-value="ubagaranam">
-        <span class="icon">agriculture</span> உபகரணம் / Ubagaranam
-      </button>
+  <!-- Name -->
+  <div class="field-row">
+    <div style="flex:1;">
+      <label class="field-label" for="name"><span class="icon">person</span>Name</label>
+      <input id="name" placeholder="Enter Name">
     </div>
-    <input type="hidden" id="subsidyType" value="">
+    <button type="button" class="voice-btn" id="voiceName"><span class="icon">mic</span></button>
   </div>
-  <button type="button" class="voice-btn" id="voiceSubsidy"><span class="icon">mic</span></button>
-</div>
 
-<!-- Amount -->
-<div class="field-row">
-  <div style="flex:1;">
-    <label class="field-label" for="amount"><span class="icon">payments</span>Amount</label>
-    <input id="amount" placeholder="Enter Amount" pattern="[0-9]*">
-    <div class="numeric-keypad" id="numericKeypad"></div>
+  <!-- Farm Location -->
+  <div class="field-row">
+    <div style="flex:1;">
+      <label class="field-label" for="location"><span class="icon">location_on</span>Farm Location</label>
+      <input id="location" placeholder="Enter Location">
+    </div>
+    <button type="button" class="voice-btn" id="voiceLocation"><span class="icon">mic</span></button>
   </div>
-  <button type="button" class="voice-btn" id="voiceAmount"><span class="icon">mic</span></button>
-</div>
 
-<!-- Aadhaar Input -->
-<div class="field-row">
-  <div style="flex:1;">
+  <!-- Subsidy Type -->
+  <div style="margin-bottom:10px;">
+    <label class="field-label"><span class="icon">agriculture</span>Subsidy Type</label>
+    <div id="subsidyContainer">
+      <button type="button" class="subsidy-btn" data-value="urimam">ஊரிமம் / Urimam</button>
+      <button type="button" class="subsidy-btn" data-value="parivu">பரிவு / Parivu</button>
+      <button type="button" class="subsidy-btn" data-value="vidhai">விதை / Vidhai</button>
+      <button type="button" class="subsidy-btn" data-value="ubagaranam">உபகரணம் / Ubagaranam</button>
+    </div>
+    <button type="button" class="voice-btn" id="voiceSubsidy"><span class="icon">mic</span></button>
+  </div>
+
+  <!-- Amount -->
+  <div class="field-row">
+    <div style="flex:1;">
+      <label class="field-label" for="amount"><span class="icon">payments</span>Amount</label>
+      <input id="amount" placeholder="Enter Amount" pattern="[0-9]*">
+      <div class="numeric-keypad" id="amountKeypad"></div>
+    </div>
+    <button type="button" class="voice-btn" id="voiceAmount"><span class="icon">mic</span></button>
+  </div>
+
+  <!-- Aadhaar Number -->
+  <div style="margin-top:17px;">
     <label class="field-label" for="aadhaarNumber"><span class="icon">credit_card</span>Aadhaar Card</label>
     <div class="numeric-keypad" id="aadhaarKeypad"></div>
-    <input id="aadhaarNumber" placeholder="XXXX XXXX XXXX" readonly>
+    <input id="aadhaarNumber" placeholder="Enter 12-digit Aadhaar" readonly>
     <video id="video" autoplay muted playsinline></video>
+    <div class="hint" id="cameraHint"><span class="icon">fact_check</span>Hold card steady, auto-fill Aadhaar.</div>
   </div>
-</div>
 
-<button type="submit" class="submit-btn">Submit Form</button>
+  <button type="submit" class="submit-btn">Submit Form</button>
 </form>
+
 <div id="successTick">✔</div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.4.0/dist/tesseract.min.js"></script>
 <script>
-// ===== PROGRESS BAR =====
+/* ===== PROGRESS BAR ===== */
 function setProgress(val){document.querySelector("#progressBar span").style.width=val+"%";}
-["name","location","subsidyType","amount","aadhaarNumber"].forEach((id,i)=>{
+["name","location","amount","aadhaarNumber"].forEach((id,i)=>{
   document.getElementById(id).addEventListener("focus",()=>setProgress((i+1)*20));
 });
 
-// ===== Numeric Keypads =====
+/* ===== OCR for Aadhaar ===== */
+const video=document.getElementById("video");
+const aadhaarInput=document.getElementById("aadhaarNumber");
+const canvas=document.createElement("canvas");
+const ctx=canvas.getContext("2d");
+let ocrWorker;
+
+async function initOCR(){
+  ocrWorker=Tesseract.createWorker({logger:m=>console.log(m)});
+  await ocrWorker.load();
+  await ocrWorker.loadLanguage('eng');
+  await ocrWorker.initialize('eng');
+}
+initOCR();
+
+async function startCamera(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject=stream;
+    video.play();
+  }catch(e){console.warn(e);}
+}
+startCamera();
+
+/* ===== Numeric Keypads ===== */
 const amountInput=document.getElementById("amount");
-const keypad=document.getElementById("numericKeypad");
+const amountKeypad=document.getElementById("amountKeypad");
 [1,2,3,4,5,6,7,8,9,0].forEach(n=>{
   const btn=document.createElement("button");
-  btn.type="button";
-  btn.textContent=n;
+  btn.type="button"; btn.textContent=n;
   btn.onclick=()=>{amountInput.value+=n;};
-  keypad.appendChild(btn);
+  amountKeypad.appendChild(btn);
 });
 
-const aadhaarInput=document.getElementById("aadhaarNumber");
 const aadhaarKeypad=document.getElementById("aadhaarKeypad");
 [1,2,3,4,5,6,7,8,9,0].forEach(n=>{
   const btn=document.createElement("button");
-  btn.type="button";
-  btn.textContent=n;
+  btn.type="button"; btn.textContent=n;
   btn.onclick=()=>{
     if(aadhaarInput.value.replace(/\s/g,'').length<12){
-      let val=aadhaarInput.value.replace(/\s/g,'')+n;
-      aadhaarInput.value=val.replace(/(\d{4})(?=\d)/g, '$1 ');
-      if(val.length===12){
+      aadhaarInput.value+=n;
+      if(aadhaarInput.value.length%4===0 && aadhaarInput.value.length<12) aadhaarInput.value+=' ';
+      if(aadhaarInput.value.replace(/\s/g,'').length===12){
         playAfterAadhaar();
       }
     }
@@ -283,36 +312,106 @@ const aadhaarKeypad=document.getElementById("aadhaarKeypad");
   aadhaarKeypad.appendChild(btn);
 });
 
-// ===== After Aadhaar Audio =====
-const afterAadhaarAudio=new Audio("https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3");
-function playAfterAadhaar(){
-  afterAadhaarAudio.play();
-  afterAadhaarAudio.onended=()=>{
-    const utter=new SpeechSynthesisUtterance("Details have been fetched from the bank linked to this Aadhaar number");
-    utter.lang="en-IN";
-    speechSynthesis.speak(utter);
-    // Enable submit only after audio finishes
-    document.querySelector(".submit-btn").disabled=false;
+/* ===== Audio setup ===== */
+const baseURL="https://raw.githubusercontent.com/shariqua06/farmer-audio/main/";
+const tamilAudios={
+  name:baseURL+'name.mp3',
+  location:baseURL+'farmlocation.mp3',
+  subsidyType:baseURL+'type.mp3',
+  amount:baseURL+'amount.mp3',
+  aadhaar:baseURL+'aadhar.mp3',
+  afterAadhaar:baseURL+'after-aadhar.mp3'
+};
+const englishAudios={
+  name:"", location:"", subsidyType:"", amount:"", aadhaar:"", afterAadhaar:""
+};
+
+/* ===== Utility Functions ===== */
+function playAudioSequence(tamilSrc, englishSrc, callback){
+  const tamil=new Audio(tamilSrc);
+  tamil.play();
+  tamil.onended=()=>{
+    if(englishSrc){
+      const english=new Audio(englishSrc);
+      english.play();
+      english.onended=callback||(()=>{});
+    } else { callback && callback(); }
   };
 }
 
-// Initially disable submit button until Aadhaar audio finished
-document.querySelector(".submit-btn").disabled=true;
-
-// ===== Subsidy Type Voice & Click =====
-const subsidyMap={'urimam':'urimam','parivu':'parivu','vidhai':'vidhai','ubagaranam':'ubagaranam','உரிமம்':'urimam','பரிவு':'parivu','விதை':'vidhai','உபகரணம்':'ubagaranam'};
-document.querySelectorAll('.subsidy-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const val=btn.dataset.value;
-    document.getElementById('subsidyType').value=val;
-    // Play Tamil audio then English TTS
-    const tamilAudio=new Audio("https://raw.githubusercontent.com/shariqua06/farmer-audio/main/type.mp3");
-    tamilAudio.play();
-    tamilAudio.onended=()=>{
-      const utter=new SpeechSynthesisUtterance("Subsidy type selected: "+val);
-      utter.lang='en-IN';
-      speechSynthesis.speak(utter);
+/* ===== Voice Input ===== */
+function startVoiceInput(field){
+  const btn=document.getElementById('voice'+field.charAt(0).toUpperCase()+field.slice(1));
+  btn.classList.add('active');
+  btn.disabled=true;
+  playAudioSequence(tamilAudios[field], englishAudios[field],()=>{
+    const recognition=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+    recognition.lang='en-IN';
+    recognition.interimResults=false;
+    recognition.maxAlternatives=1;
+    recognition.onresult=e=>{
+      document.getElementById(field).value=e.results[0][0].transcript.trim();
+      btn.disabled=false;
+      btn.classList.remove('active');
     };
+    recognition.onerror=()=>{
+      btn.disabled=false;
+      btn.classList.remove('active');
+    };
+    recognition.start();
   });
+}
+
+document.getElementById("voiceName").onclick=()=>startVoiceInput('name');
+document.getElementById("voiceLocation").onclick=()=>startVoiceInput('location');
+document.getElementById("voiceAmount").onclick=()=>startVoiceInput('amount');
+
+/* ===== Subsidy Type Voice Recognition ===== */
+const subsidyButtons=document.querySelectorAll(".subsidy-btn");
+document.getElementById("voiceSubsidy").onclick=()=>{
+  const btn=document.getElementById("voiceSubsidy");
+  btn.classList.add('active'); btn.disabled=true;
+  playAudioSequence(tamilAudios.subsidyType, englishAudios.subsidyType,()=>{
+    const recognition=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+    recognition.lang='en-IN';
+    recognition.interimResults=false;
+    recognition.maxAlternatives=1;
+    recognition.onresult=e=>{
+      let text=e.results[0][0].transcript.trim().toLowerCase();
+      subsidyButtons.forEach(b=>{
+        if(b.textContent.toLowerCase().includes(text)) b.click();
+      });
+      btn.disabled=false;
+      btn.classList.remove('active');
+    };
+    recognition.onerror=()=>{btn.disabled=false;btn.classList.remove('active');};
+    recognition.start();
+  });
+};
+
+subsidyButtons.forEach(b=>{
+  b.onclick=()=>{document.getElementById('subsidyTypeValue')?.remove(); const val=document.createElement('input'); val.id='subsidyTypeValue'; val.type='hidden'; val.value=b.dataset.value; document.getElementById('form').appendChild(val);};
 });
+
+/* ===== After Aadhaar Audio ===== */
+function playAfterAadhaar(){
+  playAudioSequence(tamilAudios.afterAadhaar, englishAudios.afterAadhaar);
+}
+
+/* ===== Form Submit ===== */
+document.getElementById("form").onsubmit=e=>{
+  e.preventDefault();
+  const allFields=['name','location','amount','aadhaarNumber','subsidyTypeValue'];
+  let valid=true;
+  allFields.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el||!el.value){valid=false; el?.style.setProperty('border-color','#ee2929'); setTimeout(()=>el?.style.removeProperty('border-color'),1800);}
+  });
+  if(!valid){alert("Please fill all fields."); return;}
+  alert("Form Submitted!\nName: "+document.getElementById('name').value+"\nLocation: "+document.getElementById('location').value+"\nSubsidy: "+document.getElementById('subsidyTypeValue').value+"\nAmount: "+document.getElementById('amount').value+"\nAadhaar: "+document.getElementById('aadhaarNumber').value);
+  document.getElementById("form").reset();
+  document.querySelector("#progressBar span").style.width="0%";
+  document.getElementById("successTick").style.display="block";
+  setTimeout(()=>{document.getElementById("successTick").style.display="none";},2500);
+};
 </script>
