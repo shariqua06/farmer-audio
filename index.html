@@ -6,11 +6,12 @@
 <title>Farmer Subsidy Application</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Icons&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--accent:#4f46e5;--accent2:#48bee5;--green:#16a34a}*{box-sizing:border-box}
+:root{--accent:#4f46e5;--accent2:#48bee5;--green:#16a34a}
+*{box-sizing:border-box}
 body{font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#f7ffe0,#e0e7ff);min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;color:#1e2539}
-.container{background:#fff;border-radius:18px;padding:28px;width:100%;max-width:620px;box-shadow:0 18px 60px rgba(30,40,80,0.08)}
-h2{color:var(--accent);text-align:center;margin:0 0 6px;font-size:1.35rem}
-.subtitle{color:#6b7280;text-align:center;margin:0 0 18px}
+.container{background:#fff;border-radius:18px;padding:26px;width:100%;max-width:680px;box-shadow:0 20px 60px rgba(30,40,80,0.08)}
+h2{color:var(--accent);text-align:center;margin:0 0 6px;font-size:1.4rem}
+.subtitle{color:#6b7280;text-align:center;margin:0 0 14px}
 #progressBar{height:8px;background:#eef2ff;border-radius:8px;overflow:hidden;margin:8px 0 18px}
 #progressBar span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#7a88ff,#48bee5);transition:width .35s}
 .field-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
@@ -18,7 +19,7 @@ h2{color:var(--accent);text-align:center;margin:0 0 6px;font-size:1.35rem}
 input,select{width:100%;padding:12px 14px;border-radius:10px;border:2px solid #e6eaf8;background:#fbfeff;font-size:1rem;transition:box-shadow .18s,border-color .18s}
 input:focus,select:focus{outline:none;border-color:#7a88ff;box-shadow:0 10px 30px rgba(120,130,255,0.06)}
 .icon{font-family:'Material Icons';font-size:20px;color:var(--accent2)}
-/* voice button - no recording pulsing effect per request */
+/* voice button - minimal (no pulsing effect per request) */
 .voice-btn{width:52px;height:52px;border-radius:50%;border:none;background:#ebe6ff;color:var(--accent);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center}
 .voice-btn:disabled{opacity:.45;cursor:not-allowed}
 .numeric-keypad{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -29,37 +30,41 @@ input:focus,select:focus{outline:none;border-color:#7a88ff;box-shadow:0 10px 30p
 #successTick{display:none;position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(0);font-size:110px;color:var(--green);z-index:9999}
 .check-bubble{position:fixed;right:32px;bottom:32px;background:var(--green);color:#fff;width:64px;height:64px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 18px 50px rgba(16,185,129,0.16);opacity:0;transform:translateY(20px);transition:all .45s;z-index:9998}
 .check-bubble.show{opacity:1;transform:translateY(0)}
-@keyframes popIn {0%{transform:translate(-50%,-50%) scale(0);}60%{transform:translate(-50%,-50%) scale(1.15);}100%{transform:translate(-50%,-50%) scale(1)}}
-@media(max-width:520px){.container{padding:16px;border-radius:12px}#video{min-height:90px}}
+/* subtle listening badge (no pulsing mic) */
+#listeningBadge{position:fixed;left:50%;top:10%;transform:translateX(-50%);background:rgba(79,70,229,0.95);color:#fff;padding:10px 16px;border-radius:999px;font-weight:700;display:none;z-index:9999;box-shadow:0 12px 30px rgba(79,70,229,0.14)}
+@keyframes popIn{0%{transform:translate(-50%,-50%) scale(0);}60%{transform:translate(-50%,-50%) scale(1.12);}100%{transform:translate(-50%,-50%) scale(1)}}
+@media(max-width:520px){.container{padding:14px}#video{min-height:90px}}
 </style>
 </head>
 <body>
-<div class="container" id="app">
+<div id="listeningBadge">Listening…</div>
+
+<div class="container">
   <h2>Farmer Subsidy Application</h2>
-  <div class="subtitle">Tamil prompt → female English prompt → Speak. Aadhaar plays after completion (after-aadhar.mp3).</div>
+  <div class="subtitle">Tamil audio → English prompt (female) → Speak. Aadhaar plays after completion (after-aadhar.mp3).</div>
 
   <div id="progressBar"><span></span></div>
 
   <form id="form" autocomplete="off">
-    <!-- NAME -->
+    <!-- Name -->
     <div class="field-row">
       <div style="flex:1">
         <label class="field-label"><span class="icon">person</span><span>Name</span></label>
         <input id="name" placeholder="Enter name" />
       </div>
-      <button type="button" class="voice-btn" id="voiceName" title="Voice input for Name"><span class="icon">mic</span></button>
+      <button type="button" class="voice-btn" id="voiceName" title="Voice input for name"><span class="icon">mic</span></button>
     </div>
 
-    <!-- LOCATION -->
+    <!-- Farm Location -->
     <div class="field-row">
       <div style="flex:1">
         <label class="field-label"><span class="icon">location_on</span><span>Farm Location</span></label>
         <input id="location" placeholder="Enter farm location" />
       </div>
-      <button type="button" class="voice-btn" id="voiceLocation" title="Voice input for Location"><span class="icon">mic</span></button>
+      <button type="button" class="voice-btn" id="voiceLocation" title="Voice input for location"><span class="icon">mic</span></button>
     </div>
 
-    <!-- SUBSIDY -->
+    <!-- Subsidy Type -->
     <div class="field-row">
       <div style="flex:1">
         <label class="field-label"><span class="icon">agriculture</span><span>Subsidy Type</span></label>
@@ -71,20 +76,20 @@ input:focus,select:focus{outline:none;border-color:#7a88ff;box-shadow:0 10px 30p
           <option value="ubagaranam">Ubagaranam</option>
         </select>
       </div>
-      <button type="button" class="voice-btn" id="voiceSubsidy" title="Voice input for Subsidy Type"><span class="icon">mic</span></button>
+      <button type="button" class="voice-btn" id="voiceSubsidy" title="Voice input for subsidy type"><span class="icon">mic</span></button>
     </div>
 
-    <!-- AMOUNT -->
+    <!-- Amount -->
     <div class="field-row">
       <div style="flex:1">
         <label class="field-label"><span class="icon">payments</span><span>Amount</span></label>
         <input id="amount" placeholder="Enter amount" inputmode="numeric" />
         <div class="numeric-keypad" id="amountKeypad"></div>
       </div>
-      <button type="button" class="voice-btn" id="voiceAmount" title="Voice input for Amount"><span class="icon">mic</span></button>
+      <button type="button" class="voice-btn" id="voiceAmount" title="Voice input for amount"><span class="icon">mic</span></button>
     </div>
 
-    <!-- AADHAAR -->
+    <!-- Aadhaar -->
     <div class="field-row">
       <div style="flex:1">
         <label class="field-label"><span class="icon">credit_card</span><span>Aadhaar Number</span></label>
@@ -95,7 +100,7 @@ input:focus,select:focus{outline:none;border-color:#7a88ff;box-shadow:0 10px 30p
     </div>
 
     <video id="video" autoplay muted playsinline></video>
-    <div class="hint"><span class="icon">fact_check</span>Hold Aadhaar card steady so OCR can auto-fill (preprocessing applied).</div>
+    <div class="hint"><span class="icon">fact_check</span>Hold Aadhaar card steady for OCR; formatting and keypad available.</div>
 
     <button class="submit-btn" type="submit">Submit Form</button>
   </form>
@@ -108,71 +113,60 @@ input:focus,select:focus{outline:none;border-color:#7a88ff;box-shadow:0 10px 30p
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.4.0/dist/tesseract.min.js"></script>
 
 <script>
-/* ================= CONFIG: GitHub audio URLs (your repo) ================= */
+/* ---------------- CONFIG - audio files in your repo ---------------- */
 const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/';
 const tamilAudios = {
   name: GITHUB_RAW_BASE + 'name.mp3',
   location: GITHUB_RAW_BASE + 'farmlocation.mp3',
   subsidyType: GITHUB_RAW_BASE + 'type.mp3',
   amount: GITHUB_RAW_BASE + 'amount.mp3',
-  aadhaar: GITHUB_RAW_BASE + 'after-aadhar.mp3' // you uploaded this file
+  aadhaar: GITHUB_RAW_BASE + 'after-aadhar.mp3' // your uploaded Tamil audio for Aadhaar
 };
 
-/* ================= DOM refs ================= */
+/* ---------------- DOM refs ---------------- */
+const listeningBadge = document.getElementById('listeningBadge');
 const progressBar = document.querySelector('#progressBar span');
 const videoEl = document.getElementById('video');
 const aadhaarInput = document.getElementById('aadhaarNumber');
 const successTick = document.getElementById('successTick');
 const checkBubble = document.getElementById('checkBubble');
 
-/* ---------------- progress helper ---------------- */
+/* ---------------- small helpers ---------------- */
 function setProgress(p){ progressBar.style.width = p + '%'; }
 ['name','location','subsidyType','amount','aadhaarNumber'].forEach((id,i)=>{
-  const el = document.getElementById(id); if(el) el.addEventListener('focus', ()=> setProgress((i+1)*20));
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('focus', ()=> setProgress((i+1)*20));
 });
 
-/* ================= Tesseract init (worker) ================= */
+/* ---------------- Tesseract worker init ---------------- */
 let tessWorker = null;
 let ocrReady = false;
 async function initTesseract(){
   try{
-    tessWorker = Tesseract.createWorker({ logger: m => { /* optional logging */ } });
-    await tessWorker.load();
-    await tessWorker.loadLanguage('eng');
-    await tessWorker.initialize('eng');
-    ocrReady = true;
-    console.log('Tesseract ready');
-  }catch(err){
-    console.error('Tesseract init failed', err);
-    ocrReady = false;
-  }
+    tessWorker = Tesseract.createWorker({ logger: m => {/* optional */} });
+    await tessWorker.load(); await tessWorker.loadLanguage('eng'); await tessWorker.initialize('eng');
+    ocrReady = true; console.log('Tesseract ready');
+  }catch(err){ console.error('Tesseract init failed', err); ocrReady = false; }
 }
 initTesseract();
 
-/* ================= camera start ================= */
+/* ---------------- camera start ---------------- */
 async function startCamera(){
   try{
-    const s = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
-    videoEl.srcObject = s; await videoEl.play();
-  }catch(err){
-    console.warn('Camera error', err);
-  }
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
+    videoEl.srcObject = stream; await videoEl.play();
+  }catch(err){ console.warn('Camera error', err); }
 }
 startCamera();
 
-/* ================= improved OCR preprocessing & scan loop ================= */
-/* Preprocess: upscale, grayscale, contrast, threshold */
+/* ---------------- Improved OCR: preprocess + controlled loop ---------------- */
 function preprocessFrameForOCR(srcCanvas, targetScale = 2.0, threshold = 140){
   const sw = srcCanvas.width, sh = srcCanvas.height;
   const tw = Math.round(sw * targetScale), th = Math.round(sh * targetScale);
-  const tmp = document.createElement('canvas');
-  tmp.width = tw; tmp.height = th;
-  const tctx = tmp.getContext('2d');
-  tctx.drawImage(srcCanvas, 0, 0, tw, th);
-  const img = tctx.getImageData(0,0,tw,th);
-  const d = img.data;
-  const contrast = 1.15;
-  const intercept = 128 * (1 - contrast);
+  const tmp = document.createElement('canvas'); tmp.width = tw; tmp.height = th;
+  const tctx = tmp.getContext('2d'); tctx.drawImage(srcCanvas, 0, 0, tw, th);
+  const img = tctx.getImageData(0,0,tw,th); const d = img.data;
+  const contrast = 1.15; const intercept = 128*(1-contrast);
   for(let i=0;i<d.length;i+=4){
     const gray = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114);
     let c = gray*contrast + intercept;
@@ -183,10 +177,7 @@ function preprocessFrameForOCR(srcCanvas, targetScale = 2.0, threshold = 140){
   return tmp;
 }
 
-/* Controlled scan loop: run OCR occasionally to reduce CPU */
-let lastOcrTime = 0;
-const OCR_INTERVAL_MS = 800;
-
+let lastOcrTime = 0; const OCR_INTERVAL_MS = 800;
 async function scanLoopImproved(){
   try{
     if(videoEl && videoEl.readyState >= 2 && ocrReady && tessWorker){
@@ -194,31 +185,24 @@ async function scanLoopImproved(){
       if(now - lastOcrTime >= OCR_INTERVAL_MS){
         lastOcrTime = now;
         const vw = videoEl.videoWidth || 640, vh = videoEl.videoHeight || 480;
-        // crop center region to focus on card
         const cropFactor = 0.78;
         const cropW = Math.round(vw * cropFactor), cropH = Math.round(vh * cropFactor);
         const sx = Math.max(0, Math.round((vw - cropW)/2)), sy = Math.max(0, Math.round((vh - cropH)/2));
-        const frameCanvas = document.createElement('canvas');
-        frameCanvas.width = cropW; frameCanvas.height = cropH;
-        const fctx = frameCanvas.getContext('2d');
-        fctx.drawImage(videoEl, sx, sy, cropW, cropH, 0, 0, cropW, cropH);
+        const frameCanvas = document.createElement('canvas'); frameCanvas.width = cropW; frameCanvas.height = cropH;
+        const fctx = frameCanvas.getContext('2d'); fctx.drawImage(videoEl, sx, sy, cropW, cropH, 0, 0, cropW, cropH);
         const pre = preprocessFrameForOCR(frameCanvas, 2.0, 140);
         try{
           const res = await tessWorker.recognize(pre);
           const text = res?.data?.text || '';
-          // optional debug: console.log('OCR raw:', text);
           const match = text.match(/\b\d{4}\s*\d{4}\s*\d{4}\b/);
           if(match){
             const digits = match[0].replace(/\s/g,'');
             if(digits.length === 12 && !getDigits(aadhaarInput.value)){
               setAadhaarDigits(digits);
-              // when detected by OCR, play aadhaar flow
               playAadhaarTamilThenEnglish();
             }
           }
-        }catch(ocrErr){
-          // ignore read errors
-        }
+        }catch(e){ /* ignore intermittent ocr errors */ }
       }
     }
   }catch(e){ console.warn('scanLoop error', e); }
@@ -226,15 +210,12 @@ async function scanLoopImproved(){
 }
 scanLoopImproved();
 
-/* ================= keypads ================= */
+/* ---------------- Keypads for amount & aadhaar ---------------- */
 function buildKeypad(containerId, inputEl, maxDigits=12){
-  const container = document.getElementById(containerId);
-  if(!container) return;
-  container.innerHTML = '';
-  const keys = [1,2,3,4,5,6,7,8,9,'←',0,'CLR'];
+  const container = document.getElementById(containerId); if(!container) return;
+  container.innerHTML = ''; const keys = [1,2,3,4,5,6,7,8,9,'←',0,'CLR'];
   keys.forEach(k=>{
-    const btn = document.createElement('button');
-    btn.type='button'; btn.textContent = k;
+    const btn = document.createElement('button'); btn.type='button'; btn.textContent = k;
     btn.onclick = ()=>{
       if(k==='CLR'){ inputEl.value=''; return; }
       if(k==='←'){ inputEl.value = formatAadhaarDigits(getDigits(inputEl.value).slice(0,-1)); return; }
@@ -249,152 +230,109 @@ function buildKeypad(containerId, inputEl, maxDigits=12){
 buildKeypad('amountKeypad', document.getElementById('amount'), 10);
 buildKeypad('aadhaarKeypad', aadhaarInput, 12);
 
-/* ================ Aadhaar formatting helpers ================ */
+/* ---------------- Aadhaar formatting helpers ---------------- */
 function getDigits(formatted){ return (formatted||'').replace(/\D/g,''); }
-function formatAadhaarDigits(digits){
-  const g1 = digits.slice(0,4), g2 = digits.slice(4,8), g3 = digits.slice(8,12);
-  return [g1,g2,g3].filter(Boolean).join(' ');
-}
+function formatAadhaarDigits(digits){ const g1=digits.slice(0,4), g2=digits.slice(4,8), g3=digits.slice(8,12); return [g1,g2,g3].filter(Boolean).join(' '); }
 function setAadhaarDigits(digits){ aadhaarInput.value = formatAadhaarDigits(digits); }
 
-/* ================= audio helper with fallback ================= */
+/* ---------------- audio helper ---------------- */
 function makeAudio(url){
-  const a = new Audio();
-  a.crossOrigin = 'anonymous';
-  a.preload = 'auto';
-  a.src = url;
-  a.addEventListener('error', (e)=> {
-    console.error('Audio load error', url, e);
-    if(!window._audioAlertShown){ window._audioAlertShown = true; alert('Unable to load Tamil audio from GitHub. Check filenames and repo.'); }
-  });
+  const a = new Audio(); a.crossOrigin='anonymous'; a.preload='auto'; a.src = url;
+  a.addEventListener('error', (e)=>{ console.error('Audio load error', url, e); if(!window._audioAlertShown){ window._audioAlertShown=true; alert('Unable to load Tamil audio from GitHub. Check filenames/repo.'); }});
   return a;
 }
 
-/* ================= pick female-ish voice for TTS ================= */
+/* ---------------- pick female voice for TTS ---------------- */
 let preferredVoice = null;
-function pickFemaleVoice(){
-  const vs = speechSynthesis.getVoices();
-  if(!vs || vs.length===0) return null;
-  let v = vs.find(x=>/female/i.test(x.name));
-  if(v) return v;
-  v = vs.find(x=>/Google UK English Female/i.test(x.name));
-  if(v) return v;
-  v = vs.find(x=>/en-?us|en-?gb|en-?in|en/.test(x.lang));
-  if(v) return v;
-  return vs[0];
-}
-if(speechSynthesis && speechSynthesis.onvoiceschanged !== undefined){
-  speechSynthesis.onvoiceschanged = ()=> { preferredVoice = pickFemaleVoice(); };
-  preferredVoice = pickFemaleVoice();
-}
+function pickFemaleVoice(){ const vs = speechSynthesis.getVoices(); if(!vs || vs.length===0) return null; let v = vs.find(x=>/female/i.test(x.name)); if(v) return v; v = vs.find(x=>/Google UK English Female/i.test(x.name)); if(v) return v; v = vs.find(x=>/en-?us|en-?gb|en-?in|en/.test(x.lang)); if(v) return v; return vs[0]; }
+if(speechSynthesis && speechSynthesis.onvoiceschanged !== undefined){ speechSynthesis.onvoiceschanged = ()=> { preferredVoice = pickFemaleVoice(); }; preferredVoice = pickFemaleVoice(); }
 
-/* ================= Aadhaar audio (after-aadhar) then English message ================= */
+/* ---------------- Aadhaar: Tamil then English fetched message ---------------- */
 let aadhaarPlaybackLock = false;
 function playAadhaarTamilThenEnglish(){
-  if(aadhaarPlaybackLock) return;
-  aadhaarPlaybackLock = true;
+  if(aadhaarPlaybackLock) return; aadhaarPlaybackLock = true;
   const audio = makeAudio(tamilAudios.aadhaar);
-  let tamilStarted = false;
-  audio.play().then(()=>{ tamilStarted = true; }).catch(e=>{ console.warn('Tamil play fail', e); });
+  let tamilStarted=false;
+  audio.play().then(()=>{ tamilStarted=true; }).catch(e=>{ console.warn('Tamil play fail', e); });
   const speakEnglish = () => {
     const message = 'Details have been fetched from the bank account linked to this Aadhaar number.';
-    const utt = new SpeechSynthesisUtterance(message);
-    utt.lang = 'en-IN';
-    if(!preferredVoice) preferredVoice = pickFemaleVoice();
-    if(preferredVoice) utt.voice = preferredVoice;
-    utt.onend = ()=> { aadhaarPlaybackLock = false; };
+    const utt = new SpeechSynthesisUtterance(message); utt.lang='en-IN';
+    if(!preferredVoice) preferredVoice = pickFemaleVoice(); if(preferredVoice) utt.voice = preferredVoice;
+    utt.onend = ()=>{ aadhaarPlaybackLock=false; };
     speechSynthesis.cancel(); speechSynthesis.speak(utt);
   };
-  audio.onended = speakEnglish;
-  audio.onerror = speakEnglish;
+  audio.onended = speakEnglish; audio.onerror = speakEnglish;
   setTimeout(()=>{ if(!tamilStarted) speakEnglish(); }, 1200);
 }
 
-/* ================= core field voice flow: Tamil -> female English -> recognition ================= */
+/* ---------------- Core: Tamil -> English TTS -> recognition ---------------- */
+function showListening(on){ listeningBadge.style.display = on ? 'block' : 'none'; }
 function playTamilThenTTSThenListen(field, opts={}){
-  const targetId = opts.targetId || (field === 'aadhaar' ? 'aadhaarNumber' : field);
+  const targetId = opts.targetId || (field==='aadhaar' ? 'aadhaarNumber' : field);
   const btn = document.getElementById('voice' + (targetId.charAt(0).toUpperCase() + targetId.slice(1)));
   btn.disabled = true;
-  const audio = makeAudio(tamilAudios[field]);
-  let tamilStarted = false;
-  audio.play().then(()=>{ tamilStarted = true; }).catch(e=>{ console.warn('Tamil start fail', e); });
+  const audio = makeAudio(tamilAudios[field]); let tamilStarted=false;
+  audio.play().then(()=>{ tamilStarted=true; }).catch(e=>{ console.warn('Tamil start fail', e); });
   function proceedToTTS(){
     const prompts = {
-      name: 'Please say your name now.',
-      location: 'Please say your farm location now.',
-      subsidyType: 'Please say the subsidy type now.',
-      amount: 'Please say the amount now.',
-      aadhaar: 'Please speak your twelve digit Aadhaar number slowly now.'
+      name:'Please say your name now.',
+      location:'Please say your farm location now.',
+      subsidyType:'Please say the subsidy type now.',
+      amount:'Please say the amount now.',
+      aadhaar:'Please speak your twelve digit Aadhaar number slowly now.'
     };
     const text = prompts[field] || 'Please speak now.';
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = 'en-IN';
-    if(!preferredVoice) preferredVoice = pickFemaleVoice();
-    if(preferredVoice) utt.voice = preferredVoice;
-    utt.onend = startRecognition;
-    speechSynthesis.cancel(); speechSynthesis.speak(utt);
+    const utt = new SpeechSynthesisUtterance(text); utt.lang='en-IN';
+    if(!preferredVoice) preferredVoice = pickFemaleVoice(); if(preferredVoice) utt.voice = preferredVoice;
+    utt.onend = startRecognition; speechSynthesis.cancel(); speechSynthesis.speak(utt);
   }
-  audio.onended = proceedToTTS;
-  audio.onerror = proceedToTTS;
+  audio.onended = proceedToTTS; audio.onerror = proceedToTTS;
   setTimeout(()=>{ if(!tamilStarted) proceedToTTS(); }, 1200);
 
   function startRecognition(){
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!Recognition){ alert('Speech Recognition not supported. Use Chrome.'); cleanup(); return; }
-    const rec = new Recognition();
-    rec.lang = 'en-IN';
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    rec.onresult = (ev) => {
+    if(!Recognition){ alert('Speech Recognition not supported in this browser. Use Chrome.'); cleanup(); return; }
+    const rec = new Recognition(); rec.lang='en-IN'; rec.interimResults=false; rec.maxAlternatives=1;
+    showListening(true);
+    rec.onresult = (ev)=>{
       let text = ev.results[0][0].transcript.trim();
-      if(opts.mapValues){
-        const low = text.toLowerCase();
-        if(opts.mapValues[low]) text = opts.mapValues[low];
-      }
+      if(opts.mapValues){ const low = text.toLowerCase(); if(opts.mapValues[low]) text = opts.mapValues[low]; }
       if(field === 'aadhaar'){
-        const digits = text.replace(/\D/g,'').slice(0,12);
-        setAadhaarDigits(digits);
+        const digits = text.replace(/\D/g,'').slice(0,12); setAadhaarDigits(digits);
         if(digits.length === 12) playAadhaarTamilThenEnglish();
       } else if(targetId === 'subsidyType'){
-        const sel = document.getElementById('subsidyType');
-        const low = text.toLowerCase();
-        let matched=false;
-        for(const o of sel.options){
-          if(o.value && (o.value.toLowerCase() === low || o.text.toLowerCase() === low)){ sel.value = o.value; matched=true; break; }
-        }
+        const sel = document.getElementById('subsidyType'); const low = text.toLowerCase(); let matched=false;
+        for(const o of sel.options){ if(o.value && (o.value.toLowerCase()===low || o.text.toLowerCase()===low)){ sel.value = o.value; matched=true; break; } }
         if(!matched) sel.value = text;
       } else {
         document.getElementById(targetId).value = text;
       }
-      showFieldCompleteVisual(targetId);
-      cleanup();
+      showFieldCompleteVisual(targetId); cleanup();
     };
     rec.onerror = (e)=>{ console.warn('Recognition error', e); cleanup(); };
     rec.onend = cleanup;
-    try{ rec.start(); } catch(e){ console.warn('rec.start error', e); cleanup(); }
-    function cleanup(){ btn.disabled = false; }
+    try{ rec.start(); }catch(e){ console.warn('rec.start error', e); cleanup(); }
+
+    function cleanup(){ showListening(false); btn.disabled=false; }
   }
 }
 
-/* ================= wire voice buttons ================= */
+/* ---------------- wire voice buttons ---------------- */
 document.getElementById('voiceName').onclick = ()=> playTamilThenTTSThenListen('name');
 document.getElementById('voiceLocation').onclick = ()=> playTamilThenTTSThenListen('location');
-document.getElementById('voiceSubsidy').onclick = ()=> playTamilThenTTSThenListen('subsidyType', {
-  mapValues: { 'urimam':'urimam','parivu':'parivu','vidhai':'vidhai','ubagaranam':'ubagaranam' }
-});
+document.getElementById('voiceSubsidy').onclick = ()=> playTamilThenTTSThenListen('subsidyType', { mapValues: { 'urimam':'urimam','parivu':'parivu','vidhai':'vidhai','ubagaranam':'ubagaranam' }});
 document.getElementById('voiceAmount').onclick = ()=> playTamilThenTTSThenListen('amount');
 document.getElementById('voiceAadhaar').onclick = ()=> playTamilThenTTSThenListen('aadhaar');
 
-/* ================= visual helpers ================= */
+/* ---------------- visual helper for field completion ---------------- */
 function showFieldCompleteVisual(id){
-  const el = document.getElementById(id);
-  if(!el) return;
+  const el = document.getElementById(id); if(!el) return;
   el.style.boxShadow = '0 10px 30px rgba(22,163,74,0.12)'; el.style.borderColor = '#16a34a';
   setTimeout(()=>{ if(el){ el.style.boxShadow=''; el.style.borderColor=''; } },1400);
 }
 
-/* ================= submit: only show final tick on submit ================= */
-document.getElementById('form').onsubmit = (e) => {
+/* ---------------- Submit: final tick only on submit ---------------- */
+document.getElementById('form').onsubmit = (e)=>{
   e.preventDefault();
   const missing = ['name','location','subsidyType','amount','aadhaarNumber'].filter(id=> !document.getElementById(id).value);
   if(missing.length){
@@ -402,32 +340,31 @@ document.getElementById('form').onsubmit = (e) => {
     missing.forEach(id=>{ const el = document.getElementById(id); el.style.borderColor = '#ee2b2b'; setTimeout(()=> el.style.borderColor = '', 1400); });
     return;
   }
-  // show final tick only after submit
-  showFinalSuccess();
-  setTimeout(()=>{ document.getElementById('form').reset(); setProgress(0); }, 1800);
-};
-
-function showFinalSuccess(){
+  // show final decorative tick
   successTick.style.display = 'block'; successTick.style.animation = 'none';
   void successTick.offsetWidth; successTick.style.animation = 'popIn .45s ease-out forwards';
   checkBubble.classList.add('show');
   setTimeout(()=>{ checkBubble.classList.remove('show'); }, 2600);
   setTimeout(()=>{ successTick.style.display = 'none'; }, 2400);
-}
+  setTimeout(()=>{ document.getElementById('form').reset(); setProgress(0); }, 1800);
+};
 
-/* ================= progress updates ================= */
+/* ---------------- progress updates ---------------- */
 ['name','location','subsidyType','amount','aadhaarNumber'].forEach((id)=>{
   const el = document.getElementById(id);
-  if(el) el.addEventListener('input', ()=> {
+  if(el) el.addEventListener('input', ()=>{
     const filled = ['name','location','subsidyType','amount','aadhaarNumber'].filter(x=>document.getElementById(x).value).length;
     setProgress(Math.round((filled/5)*100));
   });
 });
 
-/* ================= ensure voices loaded ================= */
-if (speechSynthesis && speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = () => { preferredVoice = pickFemaleVoice(); };
+/* ---------------- ensure speech voices loaded ---------------- */
+if(speechSynthesis && speechSynthesis.onvoiceschanged !== undefined){
+  speechSynthesis.onvoiceschanged = ()=> { preferredVoice = pickFemaleVoice(); };
   preferredVoice = pickFemaleVoice();
 }
 
-window.addEventListen
+window.addEventListener('load', ()=> { console.log('Ready — use Live Server for best camera & mic behavior.'); });
+</script>
+</body>
+</html>
