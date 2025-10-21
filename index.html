@@ -17,8 +17,8 @@ input,select{width:100%;border:2px solid #e3e7f4;background:#fafdff;font-size:1e
 input:focus,select:focus{border-color:#7a88ff;outline:none;background:#f6fafd;box-shadow:0 2px 8px rgba(120,130,255,0.12);}
 .field-row{display:flex;gap:7px;margin-bottom:8px;align-items:flex-start;}
 .icon{font-family:'Material Icons';font-weight:normal;font-style:normal;font-size:1.35em;color:#48bee5;vertical-align:bottom;}
-.voice-btn{background:#ebe6ff;color:#523ae8;border-radius:50%;padding:.5em;width:50px;height:50px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;margin-left:7px;position:relative;transition:background .2s;}
-.voice-btn:disabled{opacity:.5;cursor:not-allowed;}
+.voice-btn{background:#ebe6ff;color:#523ae8;border-radius:50%;padding:.5em;width:50px;height:50px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;margin-left:7px;position:relative;transition:all .2s;}
+.voice-btn.recording{box-shadow:0 0 10px #48bee5 inset;}
 .submit-btn{width:100%;padding:13px;color:#fff;background:#4f46e5;border-radius:12px;border:none;font-size:1.1em;font-weight:700;margin-top:18px;cursor:pointer;}
 .submit-btn:hover{background:#644bfd;}
 .numeric-keypad{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
@@ -27,8 +27,7 @@ input:focus,select:focus{border-color:#7a88ff;outline:none;background:#f6fafd;bo
 #successTick{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;color:#16a34a;z-index:9999;}
 #video{width:100%;border-radius:14px;margin-top:10px;margin-bottom:6px;background:#eee;min-height:135px;object-fit:cover;border:2px solid #e0e7ff;}
 #aadhaarNumber[readonly]{font-weight:600;background:#f4f8ff;}
-#listeningMic{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;z-index:10000;box-shadow:0 0 20px rgba(0,0,0,.3);animation:micPulse 1s infinite;}
-@keyframes micPulse{0%{transform:scale(0.9);}50%{transform:scale(1.1);}100%{transform:scale(0.9);}}
+.hint{font-size:0.9em;color:#555;}
 @media(max-width:520px){.container{max-width:97vw;padding:10px;border-radius:12px;}#video{min-height:80px;}.voice-btn{width:45px;height:45px;font-size:24px;}}
 </style>
 </head>
@@ -82,7 +81,7 @@ input:focus,select:focus{border-color:#7a88ff;outline:none;background:#f6fafd;bo
 <button type="button" class="voice-btn" id="voiceAmount"><span class="icon">mic</span></button>
 </div>
 
-<!-- Aadhaar Keypad first -->
+<!-- Aadhaar -->
 <div style="margin-top:17px;">
 <label class="field-label" for="aadhaarNumber"><span class="icon">credit_card</span>Aadhaar Card</label>
 <div class="numeric-keypad" id="aadhaarKeypad"></div>
@@ -96,7 +95,6 @@ input:focus,select:focus{border-color:#7a88ff;outline:none;background:#f6fafd;bo
 </form>
 
 <div id="successTick">✔</div>
-<div id="listeningMic">🎤</div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.4.0/dist/tesseract.min.js"></script>
 <script>
@@ -107,7 +105,7 @@ function setProgress(val){document.querySelector("#progressBar span").style.widt
 document.getElementById(id).addEventListener("focus",()=>setProgress((i+1)*20));
 });
 
-// ===== OCR =====
+// ===== OCR for Aadhaar =====
 const video=document.getElementById("video");
 const aadhaarInput=document.getElementById("aadhaarNumber");
 const bankLink=document.getElementById("bankLink");
@@ -123,11 +121,11 @@ await ocrWorker.initialize('eng');
 async function startCamera(){
 try{
 const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-video.srcObject=stream;
-video.play();
+video.srcObject=stream; video.play();
 }catch(e){console.warn(e);}
 }
 startCamera();
+
 async function scanFrame(){
 if(video.readyState===4&&ocrWorker){
 canvas.width=video.videoWidth; canvas.height=video.videoHeight;
@@ -139,8 +137,8 @@ let a=match[0].replace(/\D/g,'');
 aadhaarInput.value=a.replace(/(\d{4})(?=\d)/g,'$1 ');
 bankLink.style.display="block";
 playTamilEnglish('afterAadhaar');
-}
-} requestAnimationFrame(scanFrame);}
+}}
+requestAnimationFrame(scanFrame);}
 scanFrame();
 
 // ===== Keypads =====
@@ -152,7 +150,6 @@ btn.onclick=()=>{amountInput.value+=n;};
 numericContainer.appendChild(btn);
 });
 
-// Aadhaar Keypad
 const aadhaarContainer=document.getElementById("aadhaarKeypad");
 [1,2,3,4,5,6,7,8,9,0].forEach(n=>{
 let btn=document.createElement("button"); btn.type="button"; btn.textContent=n;
@@ -173,66 +170,75 @@ amount:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/amount.mp
 afterAadhaar:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3'
 };
 
-const listeningMic=document.getElementById("listeningMic");
-
-function playTamilEnglish(field,callback){
-let tamil=new Audio(tamilAudios[field]);
-tamil.play();
-tamil.onended=()=>{
-let en=new SpeechSynthesisUtterance();
-if(field==='afterAadhaar'){en.text="Bank details fetched from linked account";}
-else if(field==='subsidyType'){en.text="Please select subsidy type";}
-else{en.text="Please enter "+field;}
-en.lang='en-IN';
-speechSynthesis.speak(en);
-en.onend=()=>{
-if(callback) callback();
+// ===== English Audio Texts =====
+const englishTexts={
+name:'Please say your name now',
+location:'Please say your farm location now',
+subsidyType:'Please say subsidy type: Urimam, Parivu, Vidhai, or Ubagaranam',
+amount:'Please say amount in numbers',
+afterAadhaar:'Bank details fetched from linked account'
 };
+
+// ===== Helper: play Tamil then English then record =====
+function playTamilEnglish(field){
+const btn=document.getElementById('voice'+field.charAt(0).toUpperCase()+field.slice(1));
+btn.disabled=true; btn.classList.add("recording");
+const tamilAudio=new Audio(tamilAudios[field]); tamilAudio.play();
+tamilAudio.onended=()=>{
+// English TTS
+const utter=new SpeechSynthesisUtterance(englishTexts[field]);
+utter.lang='en-US';
+utter.onend=()=>{
+if(field==='afterAadhaar'){btn.disabled=false; btn.classList.remove("recording");return;}
+startVoiceRecognition(field);
+};
+speechSynthesis.speak(utter);
 };
 }
 
-// ===== Voice Input =====
-function startVoiceInput(field, inputElement, map={}){
-playTamilEnglish(field,()=>{
-listeningMic.style.display='flex';
+// ===== Start Voice Recognition =====
+function startVoiceRecognition(field){
+const btn=document.getElementById('voice'+field.charAt(0).toUpperCase()+field.slice(1));
 const recognition=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
 recognition.lang='en-IN';
-recognition.interimResults=false;
-recognition.maxAlternatives=1;
+recognition.interimResults=false; recognition.maxAlternatives=1;
+btn.classList.add("recording");
 recognition.onresult=e=>{
 let text=e.results[0][0].transcript.trim().toLowerCase();
-if(map[text]) text=map[text];
-inputElement.value=text;
-listeningMic.style.display='none';
+if(field==='subsidyType'){
+// map Tamil/English inputs
+const mapping={'urimam':'urimam','parivu':'parivu','vidhai':'vidhai','ubagaranam':'ubagaranam'};
+text=mapping[text]||text;
+document.getElementById(field).value=text;
+}else{
+document.getElementById(field).value=text;
+}
+btn.disabled=false; btn.classList.remove("recording");
 };
-recognition.onerror=()=>{listeningMic.style.display='none';};
+recognition.onerror=()=>{
+btn.disabled=false; btn.classList.remove("recording");
+};
 recognition.start();
-});
 }
 
-// Bind voices
-document.getElementById("voiceName").onclick=()=>startVoiceInput('name',document.getElementById('name'));
-document.getElementById("voiceLocation").onclick=()=>startVoiceInput('location',document.getElementById('location'));
-document.getElementById("voiceSubsidy").onclick=()=>startVoiceInput('subsidyType',document.getElementById('subsidyType'),
-{urimam:'urimam',parivu:'parivu',vidhai:'vidhai',ubagaranam:'ubagaranam'});
+// ===== Mic buttons =====
+document.getElementById("voiceName").onclick=()=>playTamilEnglish('name');
+document.getElementById("voiceLocation").onclick=()=>playTamilEnglish('location');
+document.getElementById("voiceSubsidy").onclick=()=>playTamilEnglish('subsidyType');
+document.getElementById("voiceAmount").onclick=()=>playTamilEnglish('amount');
 
-document.getElementById("voiceAmount").onclick=()=>startVoiceInput('amount',document.getElementById('amount'));
-
-// ===== Submit =====
+// ===== Submit Form =====
 document.getElementById("form").onsubmit=function(e){
 e.preventDefault();
 let valid=true;
 ['name','location','subsidyType','amount','aadhaarNumber'].forEach(id=>{
-if(!document.getElementById(id).value){
-valid=false;
-document.getElementById(id).style.borderColor="#ee2929";
-setTimeout(()=>document.getElementById(id).style.borderColor="",1800);
-}});
-if(!valid){alert("Please fill all fields.");return;}
-document.getElementById("successTick").style.display='block';
-setTimeout(()=>document.getElementById("successTick").style.display='none',2500);
+if(!document.getElementById(id).value){valid=false; document.getElementById(id).style.borderColor="#ee2929"; setTimeout(()=>document.getElementById(id).style.borderColor="",1800);}});
+if(!valid){alert("Please fill all fields."); return;}
+alert("Form Submitted!\nName: "+document.getElementById('name').value+"\nLocation: "+document.getElementById('location').value+"\nSubsidy: "+document.getElementById('subsidyType').value+"\nAmount: "+document.getElementById('amount').value+"\nAadhaar: "+document.getElementById('aadhaarNumber').value+"\nBank linked (dummy) ✅");
+document.getElementById("form").reset(); setProgress(0); bankLink.style.display="none";
+document.getElementById('successTick').style.display='block';
+setTimeout(()=>{document.getElementById('successTick').style.display='none';},2500);
 };
-
 </script>
 </body>
 </html>
