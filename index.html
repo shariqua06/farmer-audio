@@ -72,6 +72,11 @@ input:focus{border-color:#7c3aed;outline:none;background:#f6fafd;box-shadow:0 2p
   </div>
 </div>
 
+<!-- Subsidy Audio Button -->
+<div class="field-row">
+  <button type="button" class="voice-btn" id="voiceSubsidyAudio"><span class="icon">volume_up</span></button>
+</div>
+
 <!-- Amount -->
 <div class="field-row">
   <div style="flex:1;">
@@ -91,6 +96,11 @@ input:focus{border-color:#7c3aed;outline:none;background:#f6fafd;box-shadow:0 2p
   </div>
 </div>
 
+<!-- Aadhaar Audio Button -->
+<div class="field-row">
+  <button type="button" class="voice-btn" id="voiceAadhaar"><span class="icon">volume_up</span></button>
+</div>
+
 <button type="submit" class="submit-btn" disabled>Submit Form</button>
 </form>
 
@@ -105,13 +115,7 @@ const tamilAudios = {
   location: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/farmlocation.mp3',
   amount: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/amount.mp3',
   aadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/aadhar.mp3',
-  afterAadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3',
-  subsidy: {
-    urimam:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/urimam.mp3',
-    parivu:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/parivu.mp3',
-    vidhai:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/vidhai.mp3',
-    ubagaranam:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/ubagaranam.mp3'
-  }
+  afterAadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3'
 };
 
 // English TTS
@@ -198,13 +202,22 @@ subsidyButtons.forEach(btn=>{
     subsidyButtons.forEach(b=>b.classList.remove('selected'));
     btn.classList.add('selected');
     selectedSubsidy=btn.dataset.value;
-    const audio=new Audio(tamilAudios.subsidy[selectedSubsidy]);
-    audio.play();
-    await new Promise(res=>audio.onended=res);
-    await generateEnglishAudio("You selected",{btn:audio.replace(/\n/,' ')});
+    await generateEnglishAudio("You selected",btn.innerText.replace(/\n/,' '));
     updateSubmitState();
   };
 });
+
+// Aadhaar Audio Button
+document.getElementById('voiceAadhaar').onclick = ()=>{
+  const audio = new Audio('https://raw.githubusercontent.com/shariqua06/farmer-audio/main/aadhar.mp3');
+  audio.play();
+};
+
+// Subsidy Type Audio Button
+document.getElementById('voiceSubsidyAudio').onclick = ()=>{
+  const audio = new Audio('https://raw.githubusercontent.com/shariqua06/farmer-audio/main/type.mp3');
+  audio.play();
+};
 
 // Submit
 const form=document.getElementById('form');
