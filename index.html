@@ -13,8 +13,8 @@ h2{text-align:center;color:#7c3aed;margin-bottom:.35em;letter-spacing:1.2px;}
 #progressBar{width:100%;height:7px;background:#f1f5f9;border-radius:8px;margin:12px 0 20px;overflow:hidden;}
 #progressBar span{display:block;height:100%;background:linear-gradient(90deg,#a78bfa,#f472b6);width:0%;transition:width .4s;}
 .field-label{font-weight:600;font-size:1.03em;margin-bottom:4px;display:flex;align-items:center;gap:7px;}
-input,select{width:100%;border:2px solid #e3e7f4;background:#fafdff;font-size:1em;border-radius:11px;padding:12px 14px;margin-bottom:10px;transition:border .2s;}
-input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;box-shadow:0 2px 8px rgba(120,130,255,0.12);}
+input{width:100%;border:2px solid #e3e7f4;background:#fafdff;font-size:1em;border-radius:11px;padding:12px 14px;margin-bottom:10px;transition:border .2s;}
+input:focus{border-color:#7c3aed;outline:none;background:#f6fafd;box-shadow:0 2px 8px rgba(120,130,255,0.12);}
 .field-row{display:flex;gap:7px;margin-bottom:8px;align-items:flex-start;position:relative;}
 .icon{font-family:'Material Icons';font-weight:normal;font-style:normal;font-size:1.35em;color:#7c3aed;vertical-align:bottom;}
 .voice-btn{background:#ebe6ff;color:#523ae8;border-radius:50%;padding:.5em;width:50px;height:50px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;margin-left:7px;transition:all .2s;}
@@ -27,7 +27,11 @@ input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;bo
 .numeric-keypad button{flex:1 0 22%;padding:12px;font-size:1.1em;border-radius:6px;border:1px solid #ccc;background:#f0f0ff;cursor:pointer;}
 .numeric-keypad button:active{background:#d0d0ff;}
 #successTick{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;color:#16a34a;z-index:9999;}
-.summary{display:none;text-align:center;margin-top:15px;font-size:1.05em;color:#4b5563;}
+.popup-summary{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#f3ebff;padding:25px;border-radius:20px;box-shadow:0 8px 32px rgba(112,144,176,0.25);text-align:center;z-index:999;min-width:300px;}
+.subsidy-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.subsidy-button{flex:1 1 48%;padding:14px;font-size:1em;border-radius:12px;background:#ebe6ff;border:none;color:#523ae8;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;transition:all .2s;}
+.subsidy-button.selected{background:#7c3aed;color:#fff;}
+.subsidy-icon{font-size:28px;}
 </style>
 </head>
 <body>
@@ -55,19 +59,17 @@ input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;bo
   <button type="button" class="voice-btn" id="voiceLocation"><span class="icon">mic</span></button>
 </div>
 
-<!-- Subsidy Type -->
+<!-- Subsidy Type Buttons -->
 <div class="field-row">
   <div style="flex:1;">
     <label class="field-label"><span class="icon">agriculture</span>Subsidy Type</label>
-    <select id="subsidyType">
-      <option value="">-- Select Subsidy --</option>
-      <option value="urimam">Urimam</option>
-      <option value="parivu">Parivu</option>
-      <option value="vidhai">Vidhai</option>
-      <option value="ubagaranam">Ubagaranam</option>
-    </select>
+    <div class="subsidy-buttons" id="subsidyButtons">
+      <button type="button" class="subsidy-button" data-value="urimam"><span class="subsidy-icon">🪴</span>உரிமம்<br>Urimam</button>
+      <button type="button" class="subsidy-button" data-value="parivu"><span class="subsidy-icon">💧</span>பரிவு<br>Parivu</button>
+      <button type="button" class="subsidy-button" data-value="vidhai"><span class="subsidy-icon">🌾</span>விதை<br>Vidhai</button>
+      <button type="button" class="subsidy-button" data-value="ubagaranam"><span class="subsidy-icon">⚙</span>உபகரணம்<br>Ubagaranam</button>
+    </div>
   </div>
-  <button type="button" class="voice-btn" id="voiceSubsidy"><span class="icon">mic</span></button>
 </div>
 
 <!-- Amount -->
@@ -93,18 +95,23 @@ input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;bo
 </form>
 
 <div id="successTick">✔</div>
-<div class="summary" id="summary"></div>
+<div class="popup-summary" id="summaryPopup"></div>
 </div>
 
 <script>
-// Tamil Audio URLs
+// Tamil audio URLs
 const tamilAudios = {
   name: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/name.mp3',
   location: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/farmlocation.mp3',
-  subsidyType: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/type.mp3',
   amount: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/amount.mp3',
   aadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/aadhar.mp3',
-  afterAadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3'
+  afterAadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3',
+  subsidy: {
+    urimam:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/urimam.mp3',
+    parivu:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/parivu.mp3',
+    vidhai:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/vidhai.mp3',
+    ubagaranam:'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/ubagaranam.mp3'
+  }
 };
 
 // English TTS
@@ -126,9 +133,7 @@ function createKeypad(targetInput,keypadDiv,maxLength,spacing=false){
     btn.onclick=()=>{
       if(targetInput.value.replace(/\s/g,'').length<maxLength){
         targetInput.value+=i;
-        if(spacing){
-          targetInput.value=targetInput.value.replace(/(\d{4})(?=\d)/g,'$1 ');
-        }
+        if(spacing) targetInput.value=targetInput.value.replace(/(\d{4})(?=\d)/g,'$1 ');
         updateSubmitState();
       }
       if(targetInput.id==='aadhaarNumber' && targetInput.value.replace(/\s/g,'').length===12){
@@ -152,7 +157,7 @@ function playAfterAadhaarAudio(){
 }
 
 // Voice Flow
-async function voiceFlow(field,promptText,mapValues={}){
+async function voiceFlow(field,promptText){
   const btn=document.getElementById('voice'+field.charAt(0).toUpperCase()+field.slice(1));
   btn.classList.add('listening');btn.disabled=true;
 
@@ -168,73 +173,81 @@ async function voiceFlow(field,promptText,mapValues={}){
     alert('Voice recognition not supported');btn.classList.remove('listening');btn.disabled=false;return;
   }
   const recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-  recognition.lang='en-IN';
-  recognition.interimResults=false;
-  recognition.maxAlternatives=1;
-
-  let timer=setTimeout(()=>{recognition.stop();},3000); // 3 sec
+  recognition.lang='en-IN';recognition.interimResults=false;recognition.maxAlternatives=1;
+  let timer=setTimeout(()=>{recognition.stop();},3000);
   recognition.onresult=e=>{
     clearTimeout(timer);
-    let text=e.results[0][0].transcript.trim().toLowerCase();
-    if(mapValues[text]) text=mapValues[text];
-    const element=document.getElementById(field);
-    if(field==='subsidyType'){
-      for(let opt of element.options){
-        if(opt.value.toLowerCase()===text.toLowerCase()){
-          element.value=opt.value;
-          generateEnglishAudio("You selected",opt.text);
-          break;
-        }
-      }
-    }else{
-      element.value=text;
-    }
+    let text=e.results[0][0].transcript.trim();
+    document.getElementById(field).value=text;
     updateSubmitState();
   };
   recognition.onend=()=>{btn.classList.remove('listening');btn.disabled=false;};
   recognition.start();
 }
 
-// Button Connections
+// Buttons
 document.getElementById('voiceName').onclick=()=>voiceFlow('name','Please say your name.');
 document.getElementById('voiceLocation').onclick=()=>voiceFlow('location','Please say your farm location.');
-document.getElementById('voiceSubsidy').onclick=()=>voiceFlow('subsidyType','Say subsidy type: Urimam, Parivu, Vidhai, or Ubagaranam.',{
-  urimam:'urimam',parivu:'parivu',vidhai:'vidhai',ubagaranam:'ubagaranam'
-});
 document.getElementById('voiceAmount').onclick=()=>voiceFlow('amount','Please say the amount.');
+
+// Subsidy Buttons
+const subsidyButtons=document.querySelectorAll('.subsidy-button');
+let selectedSubsidy='';
+subsidyButtons.forEach(btn=>{
+  btn.onclick=async ()=>{
+    subsidyButtons.forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedSubsidy=btn.dataset.value;
+    const audio=new Audio(tamilAudios.subsidy[selectedSubsidy]);
+    audio.play();
+    await new Promise(res=>audio.onended=res);
+    await generateEnglishAudio("You selected",{btn:audio.replace(/\n/,' ')});
+    updateSubmitState();
+  };
+});
 
 // Submit
 const form=document.getElementById('form');
 form.onsubmit=async e=>{
   e.preventDefault();
-  const fields=['name','location','subsidyType','amount','aadhaarNumber'];
+  if(!selectedSubsidy){
+    alert('Please select subsidy type.'); return;
+  }
+  const fields=['name','location','amount','aadhaarNumber'];
   for(let f of fields){if(!document.getElementById(f).value){alert('Please fill all fields.');return;}}
 
   document.getElementById('successTick').style.display='block';
   await generateEnglishAudio('Form submitted successfully.');
 
-  const summary=document.getElementById('summary');
-  summary.innerHTML=`<b>Submitted Details:</b><br>
-  Name: ${name.value}<br>
-  Location: ${location.value}<br>
-  Subsidy: ${subsidyType.value}<br>
-  Amount: ${amount.value}<br>
-  Aadhaar: ${aadhaarNumber.value}`;
+  const summary=document.getElementById('summaryPopup');
+  summary.innerHTML=`<h3>Submitted Details</h3>
+  <p><b>Name:</b> ${document.getElementById('name').value}</p>
+  <p><b>Location:</b> ${document.getElementById('location').value}</p>
+  <p><b>Subsidy:</b> ${selectedSubsidy}</p>
+  <p><b>Amount:</b> ${document.getElementById('amount').value}</p>
+  <p><b>Aadhaar:</b> ${document.getElementById('aadhaarNumber').value}</p>`;
   summary.style.display='block';
 
-  setTimeout(()=>{document.getElementById('successTick').style.display='none';},2000);
+  setTimeout(()=>{
+    document.getElementById('successTick').style.display='none';
+    summary.style.display='none';
+  },4000);
+
   form.reset();
-  updateSubmitState();
+  selectedSubsidy='';
+  subsidyButtons.forEach(b=>b.classList.remove('selected'));
   document.querySelector('.submit-btn').disabled=true;
+  updateSubmitState();
 };
 
 // Progress Bar
 function updateSubmitState(){
-  const fields=['name','location','subsidyType','amount','aadhaarNumber'];
+  const fields=['name','location','amount','aadhaarNumber'];
   let filled=fields.filter(f=>document.getElementById(f).value).length;
-  document.querySelector('#progressBar span').style.width=(filled/fields.length*100)+'%';
+  if(selectedSubsidy) filled++;
+  document.querySelector('#progressBar span').style.width=(filled/5*100)+'%';
 }
-document.querySelectorAll('#name,#location,#amount,#subsidyType,#aadhaarNumber').forEach(inp=>{
+document.querySelectorAll('#name,#location,#amount,#aadhaarNumber').forEach(inp=>{
   inp.addEventListener('input',updateSubmitState);
 });
 updateSubmitState();
