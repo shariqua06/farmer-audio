@@ -6,35 +6,107 @@
 <title>Farmer Subsidy Application – AI Form Filler</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Icons&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Inter',Arial,sans-serif;background:linear-gradient(135deg,#f7e0ff 0%,#e0d4ff 100%);color:#1e2539;min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;}
-.container{background:#fff;border-radius:20px;width:100%;max-width:520px;padding:28px 14px 38px 14px;box-shadow:0 8px 32px rgba(112,144,176,0.18);}
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:linear-gradient(135deg,#f7e0ff 0%,#e0d4ff 100%);
+  color:#1e2539;
+  min-height:100vh;
+  margin:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.container{
+  background:#fff;
+  border-radius:20px;
+  width:100%;
+  max-width:520px;
+  padding:28px 14px 38px 14px;
+  box-shadow:0 8px 32px rgba(112,144,176,0.18);
+}
 h2{text-align:center;color:#7c3aed;margin-bottom:.35em;letter-spacing:1.2px;}
 .subtitle{text-align:center;color:#888da8;font-size:1rem;margin:0 0 16px 0;}
 #progressBar{width:100%;height:7px;background:#f1f5f9;border-radius:8px;margin:12px 0 20px;overflow:hidden;}
 #progressBar span{display:block;height:100%;background:linear-gradient(90deg,#a78bfa,#f472b6);width:0%;transition:width .4s;}
 .field-label{font-weight:600;font-size:1.03em;margin-bottom:4px;display:flex;align-items:center;gap:7px;}
-input,select{width:100%;border:2px solid #e3e7f4;background:#fafdff;font-size:1em;border-radius:11px;padding:12px 14px;margin-bottom:10px;transition:border .2s;}
-input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;box-shadow:0 2px 8px rgba(120,130,255,0.12);}
+input,select{
+  width:100%;
+  border:2px solid #e3e7f4;
+  background:#fafdff;
+  font-size:1em;
+  border-radius:11px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  transition:border .2s;
+}
+input:focus,select:focus{
+  border-color:#7c3aed;
+  outline:none;
+  background:#f6fafd;
+  box-shadow:0 2px 8px rgba(120,130,255,0.12);
+}
 .field-row{display:flex;gap:7px;margin-bottom:8px;align-items:flex-start;position:relative;}
 .icon{font-family:'Material Icons';font-weight:normal;font-style:normal;font-size:1.35em;color:#7c3aed;vertical-align:bottom;}
-.voice-btn{background:#ebe6ff;color:#523ae8;border-radius:50%;padding:.5em;width:50px;height:50px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;margin-left:7px;transition:all .2s;}
+.voice-btn{
+  background:#ebe6ff;
+  color:#523ae8;
+  border-radius:50%;
+  padding:.5em;
+  width:50px;
+  height:50px;
+  border:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:28px;
+  margin-left:7px;
+  transition:all .2s;
+}
 .voice-btn.listening{box-shadow:0 0 12px #7c3aed;animation:glow 1s infinite alternate;}
 @keyframes glow{0%{box-shadow:0 0 4px #7c3aed;}100%{box-shadow:0 0 16px #a78bfa;}}
 .voice-btn:disabled{opacity:.5;cursor:not-allowed;}
-#video{width:100%;border-radius:14px;margin-top:10px;margin-bottom:6px;background:#eee;min-height:135px;object-fit:cover;border:2px solid #e0e7ff;}
 #aadhaarNumber[readonly]{font-weight:600;background:#f4f8ff;}
-.submit-btn{width:100%;padding:13px;color:#fff;background:#7c3aed;border-radius:12px;border:none;font-size:1.1em;font-weight:700;margin-top:18px;cursor:pointer;}
+.submit-btn{
+  width:100%;
+  padding:13px;
+  color:#fff;
+  background:#7c3aed;
+  border-radius:12px;
+  border:none;
+  font-size:1.1em;
+  font-weight:700;
+  margin-top:18px;
+  cursor:pointer;
+}
 .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
 .numeric-keypad{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
-.numeric-keypad button{flex:1 0 22%;padding:12px;font-size:1.1em;border-radius:6px;border:1px solid #ccc;background:#f0f0ff;cursor:pointer;}
+.numeric-keypad button{
+  flex:1 0 22%;
+  padding:12px;
+  font-size:1.1em;
+  border-radius:6px;
+  border:1px solid #ccc;
+  background:#f0f0ff;
+  cursor:pointer;
+}
 .numeric-keypad button:active{background:#d0d0ff;}
-#successTick{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;color:#16a34a;z-index:9999;}
+#successTick{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:80px;
+  color:#16a34a;
+  z-index:9999;
+}
 </style>
 </head>
 <body>
 <div class="container">
 <h2>Farmer Subsidy Application</h2>
-<div class="subtitle">Voice + Camera + Numeric Input. Tamil & English prompts included.</div>
+<div class="subtitle">Voice + Numeric Input. Tamil & English prompts included.</div>
 <div id="progressBar"><span></span></div>
 <form id="form" autocomplete="off">
 
@@ -55,6 +127,7 @@ input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;bo
   </div>
   <button type="button" class="voice-btn" id="voiceLocation"><span class="icon">mic</span></button>
 </div>
+
 <!-- Subsidy Type Field -->
 <div class="field-row">
   <div style="flex:1;">
@@ -89,28 +162,13 @@ input:focus,select:focus{border-color:#7c3aed;outline:none;background:#f6fafd;bo
   </div>
 </div>
 
-<!-- Camera Field -->
-<div class="field-row">
-  <video id="video" autoplay muted playsinline></video>
-</div>
-
 <button type="submit" class="submit-btn" disabled>Submit Form</button>
 </form>
 <div id="successTick">✔</div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.4.0/dist/tesseract.min.js"></script>
 <script>
-// ===== Camera start =====
-const video = document.getElementById('video');
-async function startCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        video.srcObject = stream;
-        video.play();
-    } catch(e) { console.warn(e); }
-}
-startCamera();
-
 // ===== Numeric Keypads =====
 function createKeypad(targetInput, keypadDiv, maxLength, spacing=false){
     keypadDiv.innerHTML = '';
@@ -142,60 +200,78 @@ const tamilAudios = {
     afterAadhaar: 'https://raw.githubusercontent.com/shariqua06/farmer-audio/main/after-aadhar.mp3'
 };
 
-// Generate English TTS using SpeechSynthesis
+// ===== Generate English TTS =====
 function generateEnglishAudio(text){
     return new Promise(resolve=>{
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang='en-US';
         utter.onend = resolve;
         speechSynthesis.speak(utter);
-    });
+    });
 }
-// ===== Voice Recognition Flow =====
+
+// ===== Voice Recognition Flow (3 sec limit) =====
 async function voiceFlow(field, promptText, mapValues={}){
     const btn = document.getElementById('voice'+field.charAt(0).toUpperCase()+field.slice(1));
     btn.classList.add('listening');
     btn.disabled = true;
 
-    // Play Tamil first
     const tamilAudio = new Audio(tamilAudios[field]);
     tamilAudio.play();
     tamilAudio.onended = async ()=>{
-        // Play English TTS
         await generateEnglishAudio(promptText);
-        // Start voice recognition
+
         if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){
             alert('Voice recognition not supported');
             btn.classList.remove('listening'); btn.disabled=false;
             return;
         }
+
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'en-IN';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
+
+        let timeout = setTimeout(()=>recognition.stop(), 3000); // stop after 3 sec
+
         recognition.onresult = e=>{
             let text = e.results[0][0].transcript.trim().toLowerCase();
             if(mapValues[text]) text = mapValues[text];
             document.getElementById(field).value = text;
+
             if(field==='subsidyType'){
                 const selected = document.getElementById('subsidyType');
                 for(let opt of selected.options){
                     if(opt.value.toLowerCase() === text.toLowerCase()){
                         selected.value = opt.value;
-                        generateEnglishAudio("You selected",(opt.text));
+                        generateEnglishAudio("You selected",opt.text);
                         break;
                     }
                 }
             }
-            btn.classList.remove('listening'); btn.disabled=false;
+            clearTimeout(timeout);
+            btn.classList.remove('listening'); 
+            btn.disabled=false;
             updateSubmitState();
         };
-        recognition.onerror = ()=>{btn.classList.remove('listening'); btn.disabled=false;};
+
+        recognition.onerror = ()=>{
+            clearTimeout(timeout);
+            btn.classList.remove('listening');
+            btn.disabled=false;
+        };
+
+        recognition.onend = ()=>{
+            clearTimeout(timeout);
+            btn.classList.remove('listening');
+            btn.disabled=false;
+        };
+
         recognition.start();
     };
 }
 
-// ===== Wire voice buttons =====
+// ===== Wire Voice Buttons =====
 document.getElementById('voiceName').onclick = ()=>voiceFlow('name','Please say your name.');
 document.getElementById('voiceLocation').onclick = ()=>voiceFlow('location','Please say your farm location.');
 document.getElementById('voiceSubsidy').onclick = ()=>voiceFlow('subsidyType','Say subsidy type: Urimam, Parivu, Vidhai, or Ubagaranam.',{
@@ -210,7 +286,7 @@ aadhaarInput.addEventListener('input',()=>{
         const tamilAudio = new Audio(tamilAudios.afterAadhaar);
         tamilAudio.play();
         tamilAudio.onended = ()=>{generateEnglishAudio('Aadhaar number completed.');};
-        document.querySelector('.submit-btn').disabled=false;
+        setTimeout(()=>{document.querySelector('.submit-btn').disabled=false;}, 2000);
     } else document.querySelector('.submit-btn').disabled=true;
 });
 
@@ -226,21 +302,32 @@ form.onsubmit = async e=>{
         }
     }
 
-    // Show big aesthetic tick
+    // Show tick
     const tick = document.getElementById('successTick');
     tick.style.display='block';
     await generateEnglishAudio('Form submitted successfully.');
-    setTimeout(()=>{tick.style.display='none';},2000);
 
-    // Reset form
-    form.reset();
-    document.querySelectorAll('.voice-btn').forEach(b=>b.classList.remove('listening'));
-    document.querySelector('.submit-btn').disabled=true;
-    createKeypad(document.getElementById('aadhaarNumber'), document.getElementById('aadhaarKeypad'), 12, true);
-    createKeypad(document.getElementById('amount'), document.getElementById('amountKeypad'), 10, false);
+    // Show short summary
+    const summary = `
+        <div style="text-align:center;margin-top:15px;font-size:1.1em;">
+        <b>Summary:</b><br>
+        Name: ${document.getElementById('name').value}<br>
+        Location: ${document.getElementById('location').value}<br>
+        Subsidy: ${document.getElementById('subsidyType').value}<br>
+        Amount: ${document.getElementById('amount').value}<br>
+        Aadhaar: ${document.getElementById('aadhaarNumber').value}
+        </div>
+    `;
+    document.querySelector('.container').innerHTML = `
+        <h2>✅ Submitted</h2>
+        ${summary}
+        <p style="text-align:center;color:#888;margin-top:10px;">Thank you! Form saved successfully.</p>
+    `;
+
+    setTimeout(()=>{tick.style.display='none';},1500);
 };
 
-// ===== Progress Bar Update =====
+// ===== Progress Bar =====
 function updateSubmitState(){
     const fields = ['name','location','subsidyType','amount','aadhaarNumber'];
     let filled = fields.filter(f=>document.getElementById(f).value).length;
